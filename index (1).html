@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2C2A4A">
+<title>Zuri & Paxton Training Journal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"><\/script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+:root {
+  --forest: #2C2A4A;
+  --zuri: #6C5BAE;
+  --zuri-light: #EDE9F7;
+  --zuri-mid: #9B8FCC;
+  --paxton: #2A9D8F;
+  --paxton-light: #E0F4F2;
+  --paxton-mid: #70C4BA;
+  --cream: #F7F5FC;
+  --warm-white: #FEFCFF;
+  --parchment: #F0EEF8;
+  --border: #D8D3EC;
+  --text-dark: #1A1A2E;
+  --text-mid: #3D3660;
+  --text-light: #7B72A8;
+  --shadow: rgba(44,42,74,0.10);
+  --red: #C0392B;
+  --red-light: #FDECEA;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; padding-bottom: 80px; }
+
+/* HEADER */
+header {
+  background: var(--forest);
+  color: white;
+  padding: 16px 20px 14px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.app-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; line-height: 1.1; }
+.app-title span { display: block; font-size: 11px; font-weight: 400; font-family: 'Inter', sans-serif; color: var(--zuri-mid); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 2px; }
+.header-date { font-size: 11px; color: var(--zuri-mid); text-align: right; line-height: 1.5; }
+.dog-tabs { display: flex; gap: 8px; }
+.dog-tab { flex: 1; padding: 8px; border: none; border-radius: 8px; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+.dog-tab.active-zuri { background: var(--zuri); color: white; }
+.dog-tab.active-paxton { background: var(--paxton); color: white; }
+
+/* NAV */
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--warm-white); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+.nav-btn { flex: 1; padding: 10px 4px 8px; border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--text-light); font-family: 'Inter', sans-serif; font-weight: 500; transition: color 0.2s; }
+.nav-btn svg { width: 20px; height: 20px; }
+.nav-btn.active { color: var(--forest); font-weight: 700; }
+
+/* SCREENS */
+.screen { display: none; padding: 16px 16px 8px; }
+.screen.active { display: block; }
+.screen-heading { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+.screen-sub { font-size: 12px; color: var(--text-light); margin-bottom: 14px; }
+
+/* WEEK NAV */
+.week-nav-row { display: flex; align-items: center; justify-content: space-between; background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.week-arrow { width: 32px; height: 32px; border: 1.5px solid var(--border); border-radius: 50%; background: var(--parchment); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-mid); }
+.week-label-box { text-align: center; }
+.week-label-box .wl-label { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: var(--text-dark); }
+.week-label-box .wl-dates { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+
+/* CARDS */
+.card { background: var(--warm-white); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 1px 4px var(--shadow); }
+.card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.card-label.zuri { color: var(--zuri); }
+.card-label.paxton { color: var(--paxton); }
+.card-label.neutral { color: var(--text-light); }
+
+/* DAY CARDS in plan */
+.day-card { background: var(--warm-white); border-radius: 14px; margin-bottom: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 4px var(--shadow); }
+.day-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; }
+.day-card-header.zuri-day { border-left: 4px solid var(--zuri); }
+.day-card-header.paxton-day { border-left: 4px solid var(--paxton); }
+.day-card-header.today-day { background: var(--parchment); }
+.day-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: var(--text-dark); }
+.day-date-tag { font-size: 11px; color: var(--text-light); }
+.day-badge { display: flex; gap: 4px; }
+.day-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.day-status.planned { background: var(--parchment); color: var(--text-light); }
+.day-status.has-plan.zuri { background: var(--zuri-light); color: var(--zuri); }
+.day-status.has-plan.paxton { background: var(--paxton-light); color: var(--paxton); }
+.day-status.logged { background: #e8f5e9; color: #2e7d32; }
+.day-card-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+.day-card-body.open { display: block; }
+.day-card-chevron { font-size: 14px; color: var(--text-light); transition: transform 0.2s; margin-left: 6px; }
+.day-card-body.open ~ * .day-card-chevron,
+.day-card-header.open-header .day-card-chevron { transform: rotate(180deg); }
+.day-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin: 12px 0 6px; }
+
+/* TEXTAREAS / INPUTS */
+textarea, input[type="text"] { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5; color: var(--text-dark); background: var(--cream); resize: none; transition: border-color 0.2s; -webkit-appearance: none; }
+textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--zuri); background: white; }
+textarea { min-height: 72px; }
+
+/* NUMBER BULLETS */
+.num-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.num-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 9px; color: white; }
+.num-dot.zuri { background: var(--zuri); }
+.num-dot.paxton { background: var(--paxton); }
+.num-dot.red { background: var(--red); border-radius: 6px; }
+.num-dot.red.zuri { background: #7B529B; border-radius: 6px; }
+.num-dot.red.paxton { background: #1A7A6E; border-radius: 6px; }
+
+/* VOICE BUTTON */
+.voice-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--parchment); color: var(--text-mid); margin-top: 6px; }
+.voice-btn svg { width: 14px; height: 14px; }
+.voice-btn.listening { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(185,28,28,0.2); } 50% { box-shadow: 0 0 0 5px rgba(185,28,28,0); } }
+
+/* SAVE/ACTION BUTTONS */
+.save-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; cursor: pointer; color: white; margin-top: 4px; letter-spacing: 0.2px; transition: all 0.15s; }
+.save-btn:active { transform: scale(0.98); }
+.save-btn.zuri { background: var(--zuri); }
+.save-btn.paxton { background: var(--paxton); }
+.save-btn.forest { background: var(--forest); }
+.btn-row { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.action-btn.primary.zuri { background: var(--zuri); color: white; }
+.action-btn.primary.paxton { background: var(--paxton); color: white; }
+.action-btn.secondary { background: var(--parchment); color: var(--text-mid); border: 1.5px solid var(--border); }
+
+/* TOPIC CHIPS */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); background: var(--parchment); color: var(--text-mid); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.chip.on-zuri { background: var(--zuri); color: white; border-color: var(--zuri); }
+.chip.on-paxton { background: var(--paxton); color: white; border-color: var(--paxton); }
+
+/* HISTORY */
+.filter-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); background: var(--warm-white); color: var(--text-mid); cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+.filter-chip.on-all { background: var(--forest); color: white; border-color: var(--forest); }
+.filter-chip.on-zuri { background: var(--zuri); color: white; border-color: var(--zuri); }
+.filter-chip.on-paxton { background: var(--paxton); color: white; border-color: var(--paxton); }
+.entry-card { background: var(--warm-white); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; }
+.entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.entry-date { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; }
+.dog-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+.dog-badge.zuri { background: var(--zuri-light); color: var(--zuri); }
+.dog-badge.paxton { background: var(--paxton-light); color: var(--paxton); }
+.entry-preview { font-size: 13px; color: var(--text-mid); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pill-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--parchment); color: var(--text-mid); border: 1px solid var(--border); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; padding: 20px; overflow-y: auto; align-items: flex-start; padding-top: 40px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--warm-white); border-radius: 20px; padding: 22px; width: 100%; max-width: 480px; margin: 0 auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.modal-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; }
+.close-btn { width: 30px; height: 30px; border: none; border-radius: 50%; background: var(--parchment); cursor: pointer; font-size: 14px; color: var(--text-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-section { margin-bottom: 14px; }
+.modal-section h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.modal-section h4.zuri { color: var(--zuri); }
+.modal-section h4.paxton { color: var(--paxton); }
+.modal-section h4.neutral { color: var(--text-light); }
+.modal-section p, .modal-section li { font-size: 14px; line-height: 1.6; color: var(--text-dark); }
+.modal-section ul { padding-left: 16px; }
+.modal-section li { margin-bottom: 2px; }
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+.feedback-area textarea { min-height: 70px; font-size: 14px; }
+.save-feedback-btn { margin-top: 8px; padding: 7px 14px; background: var(--forest); color: white; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+/* SUMMARY */
+.summary-card { background: var(--warm-white); border-radius: 14px; padding: 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+.summary-section { margin-bottom: 12px; }
+.summary-section:last-child { margin-bottom: 0; }
+.summary-section h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; color: var(--text-light); }
+.summary-text { font-size: 14px; line-height: 1.6; color: var(--text-dark); }
+.ai-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--zuri) 0%, var(--paxton) 100%); color: white; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--forest); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-box { text-align: center; padding: 30px; color: var(--text-light); font-size: 13px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 10px; opacity: 0.35; }
+.empty-state h3 { font-family: 'Fraunces', serif; font-size: 17px; margin-bottom: 5px; color: var(--text-mid); }
+.empty-state p { font-size: 13px; line-height: 1.5; }
+
+/* SCREENSHOT */
+.screenshot-drop { border: 2px dashed var(--border); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; margin-bottom: 10px; background: var(--parchment); }
+.screenshot-preview { display: none; align-items: center; gap: 8px; margin-bottom: 10px; }
+.screenshot-preview img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); background: var(--forest); color: white; padding: 9px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 300; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* PLAN QUICK VIEW in Today */
+.plan-peek { background: var(--parchment); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; border-left: 4px solid var(--zuri); }
+.plan-peek.paxton { border-left-color: var(--paxton); }
+.plan-peek-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; color: var(--text-light); }
+.plan-peek-slot { margin-bottom: 6px; }
+.plan-peek-slot:last-child { margin-bottom: 0; }
+.plan-peek-slot-label { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.plan-peek-slot-text { font-size: 13px; color: var(--text-dark); line-height: 1.4; }
+.plan-peek-slot-text.empty { color: var(--text-light); font-style: italic; }
+
+/* SESSION SLOT TABS */
+.session-slot-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.slot-tab { flex: 1; padding: 9px 6px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--parchment); color: var(--text-light); text-align: center; transition: all 0.15s; }
+.slot-tab.active.zuri { background: var(--zuri); color: white; border-color: var(--zuri); }
+.slot-tab.active.paxton { background: var(--paxton); color: white; border-color: var(--paxton); }
+.slot-tab .slot-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+
+/* DAY PLAN SLOT inside plan card */
+.plan-slot-block { margin-bottom: 14px; }
+.plan-slot-block:last-child { margin-bottom: 0; }
+.plan-slot-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-light); }
+.plan-slot-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.plan-slot-dot.morning { background: #F59E0B; }
+.plan-slot-dot.midday { background: var(--paxton); }
+.plan-slot-dot.afternoon { background: #7C3AED; }
+
+/* REFERENCE SCREEN */
+.ref-filter-row { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; flex-wrap: wrap; }
+.ref-week-group { margin-bottom: 20px; }
+.ref-week-heading { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; color: var(--text-mid); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.ref-entry { background: var(--warm-white); border-radius: 12px; padding: 14px; margin-bottom: 8px; border: 1px solid var(--border); }
+.ref-entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.ref-date-tag { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+.ref-slot-tag { font-size: 11px; color: var(--text-light); font-weight: 600; }
+.ref-section { margin-bottom: 10px; }
+.ref-section:last-child { margin-bottom: 0; }
+.ref-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; color: var(--text-light); }
+.ref-text { font-size: 13px; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
+.ref-empty { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 13px; }
+.treatment-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="app-title"><span>Training Journal</span>Zuri & Paxton</div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+  <div class="dog-tabs">
+    <button class="dog-tab active-zuri" id="tab-zuri" onclick="selectDog('zuri')">🟣 Zuri</button>
+    <button class="dog-tab" id="tab-paxton" onclick="selectDog('paxton')">🩵 Paxton</button>
+  </div>
+</header>
+
+<!-- ===== REFERENCE SCREEN ===== -->
+<div class="screen" id="screen-ref">
+  <div class="screen-heading">Dave's Notes & Videos</div>
+  <div class="screen-sub">All feedback and videos — refer here before planning next week</div>
+  <div class="ref-filter-row">
+    <button class="filter-chip on-all" onclick="filterRef('all',this)">All</button>
+    <button class="filter-chip" onclick="filterRef('zuri',this)">🟣 Zuri</button>
+    <button class="filter-chip" onclick="filterRef('paxton',this)">🩵 Paxton</button>
+    <button class="filter-chip" onclick="filterRef('dave',this)">💬 Dave's Notes</button>
+    <button class="filter-chip" onclick="filterRef('videos',this)">📹 Videos</button>
+  </div>
+  <div id="ref-list"></div>
+</div>
+
+<!-- ===== PLAN SCREEN ===== -->
+<div class="screen active" id="screen-plan">
+  <div class="screen-heading">Week Plan</div>
+  <div class="screen-sub" id="plan-sub">Plan your sessions Monday – Sunday</div>
+
+  <div class="week-nav-row">
+    <button class="week-arrow" onclick="shiftWeek(-1, 'plan')">‹</button>
+    <div class="week-label-box">
+      <div class="wl-label" id="plan-week-label">This Week</div>
+      <div class="wl-dates" id="plan-week-dates"></div>
+    </div>
+    <button class="week-arrow" onclick="shiftWeek(1, 'plan')">›</button>
+  </div>
+
+  <div id="plan-days-container"></div>
+</div>
+
+<!-- ===== TODAY / LOG SCREEN ===== -->
+<div class="screen" id="screen-log">
+  <div class="screen-heading">Today's Session</div>
+  <div class="screen-sub" id="log-sub"></div>
+
+  <!-- Plan peek for today -->
+  <div class="plan-peek" id="plan-peek-zuri">
+    <div class="plan-peek-label">📋 Today's plan for Zuri</div>
+    <div class="plan-peek-slot" id="peek-slot-zuri-treatment" style="display:none;">
+      <div class="plan-peek-slot-label">💆 Treatment</div>
+      <div class="plan-peek-slot-text" id="peek-zuri-treatment"></div>
+    </div>
+    <div class="plan-peek-slot">
+      <div class="plan-peek-slot-label">🌅 Morning</div>
+      <div class="plan-peek-slot-text" id="peek-zuri-morning"></div>
+    </div>
+    <div class="plan-peek-slot">
+      <div class="plan-peek-slot-label">🌇 Afternoon</div>
+      <div class="plan-peek-slot-text" id="peek-zuri-afternoon"></div>
+    </div>
+  </div>
+  <div class="plan-peek paxton" id="plan-peek-paxton" style="display:none;">
+    <div class="plan-peek-label">📋 Today's plan for Paxton</div>
+    <div class="plan-peek-slot" id="peek-slot-paxton-treatment" style="display:none;">
+      <div class="plan-peek-slot-label">💆 Treatment</div>
+      <div class="plan-peek-slot-text" id="peek-paxton-treatment"></div>
+    </div>
+    <div class="plan-peek-slot">
+      <div class="plan-peek-slot-label">🌅 Morning</div>
+      <div class="plan-peek-slot-text" id="peek-paxton-morning"></div>
+    </div>
+    <div class="plan-peek-slot">
+      <div class="plan-peek-slot-label">☀️ Midday</div>
+      <div class="plan-peek-slot-text" id="peek-paxton-midday"></div>
+    </div>
+    <div class="plan-peek-slot">
+      <div class="plan-peek-slot-label">🌇 Afternoon</div>
+      <div class="plan-peek-slot-text" id="peek-paxton-afternoon"></div>
+    </div>
+  </div>
+
+  <!-- Session slot selector -->
+  <div class="session-slot-tabs" id="session-slot-tabs-zuri">
+    <button class="slot-tab active zuri" id="slot-morning" onclick="selectSlot('morning')"><span class="slot-icon">🌅</span>Morning</button>
+    <button class="slot-tab zuri" id="slot-afternoon" onclick="selectSlot('afternoon')"><span class="slot-icon">🌇</span>Afternoon</button>
+  </div>
+  <div class="session-slot-tabs" id="session-slot-tabs-paxton" style="display:none;">
+    <button class="slot-tab active paxton" id="slot-morning-p" onclick="selectSlot('morning')"><span class="slot-icon">🌅</span>Morning</button>
+    <button class="slot-tab paxton" id="slot-midday-p" onclick="selectSlot('midday')"><span class="slot-icon">☀️</span>Midday</button>
+    <button class="slot-tab paxton" id="slot-afternoon-p" onclick="selectSlot('afternoon')"><span class="slot-icon">🌇</span>Afternoon</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label" id="log-label">TRAINING SESSION</div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:6px;">What training did you do today?</div>
+    <textarea id="l-training" placeholder="Describe the session…" rows="3"></textarea>
+    <button class="voice-btn" id="v-training" onclick="startVoice('l-training','v-training')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label neutral">🏷️ TRAINING TOPICS</div>
+    <div class="chip-row" id="topic-chips">
+      <button class="chip" onclick="toggleChip(this,'Obedience')">Obedience</button>
+      <button class="chip" onclick="toggleChip(this,'Heelwork')">Heelwork</button>
+      <button class="chip" onclick="toggleChip(this,'Recall')">Recall</button>
+      <button class="chip" onclick="toggleChip(this,'Stay')">Stay</button>
+      <button class="chip" onclick="toggleChip(this,'Focus')">Focus</button>
+      <button class="chip" onclick="toggleChip(this,'Retrieve')">Retrieve</button>
+      <button class="chip" onclick="toggleChip(this,'Scent Work')">Scent Work</button>
+      <button class="chip" onclick="toggleChip(this,'Agility')">Agility</button>
+      <button class="chip" onclick="toggleChip(this,'Impulse Control')">Impulse Control</button>
+      <button class="chip" onclick="toggleChip(this,'Distraction Work')">Distraction Work</button>
+      <button class="chip" onclick="toggleChip(this,'Socialization')">Socialization</button>
+      <button class="chip" onclick="toggleChip(this,'Tricks')">Tricks</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="custom-topic" placeholder="Add topic…" style="min-height:unset;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')addTopic()">
+      <button onclick="addTopic()" style="padding:8px 14px;background:var(--forest);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label" id="wins-label">✨ THREE WINS</div>
+    <div class="num-row"><div class="num-dot zuri" id="win-dot-1">1</div><textarea id="l-win1" placeholder="First win…" rows="2" style="min-height:52px;"></textarea></div>
+    <div class="num-row"><div class="num-dot zuri" id="win-dot-2">2</div><textarea id="l-win2" placeholder="Second win…" rows="2" style="min-height:52px;"></textarea></div>
+    <div class="num-row"><div class="num-dot zuri" id="win-dot-3">3</div><textarea id="l-win3" placeholder="Third win…" rows="2" style="min-height:52px;"></textarea></div>
+    <button class="voice-btn" id="v-wins" onclick="startVoice('l-win1','v-wins')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak all three wins</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label" id="challenges-label">⚠️ CHALLENGES TODAY</div>
+    <div class="num-row"><div class="num-dot red zuri" id="ch-dot-1">1</div><textarea id="l-ch1" placeholder="What was difficult or didn't go as planned?" rows="2" style="min-height:52px;"></textarea></div>
+    <div class="num-row"><div class="num-dot red zuri" id="ch-dot-2">2</div><textarea id="l-ch2" placeholder="Another challenge (optional)…" rows="2" style="min-height:52px;"></textarea></div>
+    <button class="voice-btn" id="v-challenges" onclick="startVoice('l-ch1','v-challenges')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label neutral">🎯 ONE THING TO WORK ON NEXT SESSION</div>
+    <textarea id="l-workon" placeholder="What needs more practice next time?" rows="2" style="min-height:60px;"></textarea>
+    <button class="voice-btn" id="v-workon" onclick="startVoice('l-workon','v-workon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label neutral">📹 VIDEOS SENT TO DAVE</div>
+    <textarea id="l-videos" placeholder="Which clips, what they show…" rows="2" style="min-height:60px;"></textarea>
+    <button class="voice-btn" id="v-videos" onclick="startVoice('l-videos','v-videos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label neutral">💬 DAVE'S FEEDBACK</div>
+    <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">Type, paste, or upload a screenshot of Dave's message.</div>
+    <div class="screenshot-drop" id="ss-drop" onclick="document.getElementById('ss-input').click()">
+      <div style="font-size:20px;margin-bottom:3px;">📷</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-mid);">Upload screenshot</div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:2px;">Tap to choose from camera roll</div>
+      <input type="file" id="ss-input" accept="image/*" style="display:none" onchange="handleScreenshot(event)">
+    </div>
+    <div class="screenshot-preview" id="ss-preview">
+      <img id="ss-img" />
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-mid);" id="ss-name"></div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button onclick="readScreenshot()" id="ai-read-btn" style="padding:6px 11px;background:var(--forest);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✨ Read with AI</button>
+          <button onclick="clearScreenshot()" style="padding:6px 10px;background:var(--parchment);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Remove</button>
+        </div>
+        <div id="ai-read-status" style="font-size:12px;color:var(--text-light);display:none;margin-top:4px;">Reading…</div>
+      </div>
+    </div>
+    <textarea id="l-dave" placeholder="Dave's notes, corrections, encouragement…" rows="3"></textarea>
+  </div>
+
+  <button class="save-btn zuri" id="save-btn" onclick="saveEntry()">Save Today's Session</button>
+</div>
+
+<!-- ===== HISTORY SCREEN ===== -->
+<div class="screen" id="screen-history">
+  <div class="screen-heading">History</div>
+  <div class="screen-sub">All logged sessions</div>
+  <div class="filter-row">
+    <button class="filter-chip on-all" onclick="filterHistory('all',this)">All</button>
+    <button class="filter-chip" onclick="filterHistory('zuri',this)">🟣 Zuri</button>
+    <button class="filter-chip" onclick="filterHistory('paxton',this)">🩵 Paxton</button>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ===== SUMMARY SCREEN ===== -->
+<div class="screen" id="screen-summary">
+  <div class="screen-heading">Weekly Summary</div>
+  <div class="screen-sub">Mon–Sun review with AI coaching notes</div>
+
+  <div class="week-nav-row">
+    <button class="week-arrow" onclick="shiftWeek(-1, 'summary')">‹</button>
+    <div class="week-label-box">
+      <div class="wl-label" id="sum-week-label">This Week</div>
+      <div class="wl-dates" id="sum-week-dates"></div>
+    </div>
+    <button class="week-arrow" onclick="shiftWeek(1, 'summary')">›</button>
+  </div>
+
+  <!-- WEIGHT TRACKER -->
+  <div class="summary-card" id="weight-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--text-dark);">⚖️ Weekly Weights</div>
+      <div style="font-size:11px;color:var(--text-light);" id="weight-week-tag"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--zuri);margin-bottom:6px;">🟣 Zuri</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="w-zuri" placeholder="0.0" step="0.1" min="0" style="min-height:unset;padding:9px 10px;font-size:16px;font-weight:700;width:80px;border-color:var(--zuri);text-align:center;" oninput="saveWeights()">
+          <span style="font-size:13px;color:var(--text-light);font-weight:600;">kg</span>
+        </div>
+        <div id="w-zuri-diff" style="font-size:11px;margin-top:5px;font-weight:600;"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--paxton);margin-bottom:6px;">🩵 Paxton</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="w-paxton" placeholder="0.0" step="0.1" min="0" style="min-height:unset;padding:9px 10px;font-size:16px;font-weight:700;width:80px;border-color:var(--paxton);text-align:center;" oninput="saveWeights()">
+          <span style="font-size:13px;color:var(--text-light);font-weight:600;">kg</span>
+        </div>
+        <div id="w-paxton-diff" style="font-size:11px;margin-top:5px;font-weight:600;"></div>
+      </div>
+    </div>
+    <textarea id="w-notes" placeholder="Weight notes — vet advice, diet changes, portion adjustments…" rows="2" style="min-height:56px;margin-top:12px;font-size:13px;" oninput="saveWeights()"></textarea>
+    <button onclick="toggleWeightHistory()" id="w-hist-btn" style="background:none;border:none;font-size:12px;color:var(--text-light);font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;margin-top:6px;display:block;">📊 Show weight history ▸</button>
+    <div id="w-history" style="display:none;margin-top:10px;"></div>
+  </div>
+
+  <button class="ai-btn" onclick="generateSummary()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    Generate AI Weekly Summary
+  </button>
+  <div id="summary-output"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="dog-badge" id="m-badge" style="margin-bottom:5px;display:inline-block;"></div><div class="modal-title" id="m-title"></div></div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav>
+  <button class="nav-btn" id="nav-ref" onclick="showScreen('ref')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Reference
+  </button>
+  <button class="nav-btn active" id="nav-plan" onclick="showScreen('plan')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="8" y1="18" x2="14" y2="18"/></svg>
+    Plan
+  </button>
+  <button class="nav-btn" id="nav-log" onclick="showScreen('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    Today
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="showScreen('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Log
+  </button>
+  <button class="nav-btn" id="nav-summary" onclick="showScreen('summary')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Summary
+  </button>
+</nav>
+
+<script>
+// ─── SUPABASE SETUP ─────────────────────────────────────────────────
+const SUPA_URL = 'https://pzmkrkolvtsnvqmkecgg.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWtya29sdnRzbnZxbWtlY2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NDUyNjksImV4cCI6MjA5NzUyMTI2OX0.YcsxFwbCo5ho-w7d-Z1sBKXwwc-fS9wn0rHBF1D8A78';
+let supa = null;
+function initSupabase() {
+  try {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+    }
+  } catch(e) { supa = null; }
+}
+
+// ─── STATE ──────────────────────────────────────────────────────────
+let currentDog = 'zuri';
+let planWeekOffset = 0;
+let sumWeekOffset = 0;
+let selectedTopics = [];
+let screenshotB64 = null;
+let recognition = null;
+let activeVoiceBtn = null;
+let syncPending = false;
+
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+// ─── CLOUD STORAGE ──────────────────────────────────────────────────
+// All data stored in Supabase table 'journal_data' with key/value pairs
+// Falls back to localStorage so the app works offline too
+
+async function cloudSet(key, value) {
+  const str = typeof value === 'string' ? value : JSON.stringify(value);
+  localStorage.setItem(key, str);
+  if (!supa) return;
+  try {
+    await supa.from('journal_data').upsert({ key, value: str }, { onConflict: 'key' });
+  } catch(e) {}
+}
+
+async function cloudGet(key) {
+  if (supa) {
+    try {
+      const { data } = await supa.from('journal_data').select('value').eq('key', key).single();
+      if (data) { localStorage.setItem(key, data.value); return data.value; }
+    } catch(e) {}
+  }
+  return localStorage.getItem(key);
+}
+
+async function syncAllFromCloud() {
+  if (!supa) return;
+  try {
+    const { data } = await supa.from('journal_data').select('key, value');
+    if (data && data.length) {
+      data.forEach(row => localStorage.setItem(row.key, row.value));
+    }
+  } catch(e) {}
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────
+async function init() {
+  // Init Supabase (safe — won't crash if SDK not ready)
+  initSupabase();
+
+  // Start both week views on the current real-world week
+  planWeekOffset = currentWeekOffset();
+  sumWeekOffset = currentWeekOffset();
+  const now = new Date();
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('log-sub').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  // Render immediately from localStorage so UI appears instantly
+  updateDogTheme();
+  loadTodayDraft();
+  renderPlanWeek();
+  renderSummaryWeekNav();
+  renderHistory();
+  updatePlanPeek();
+
+  // Then sync from cloud in background if available
+  if (supa) {
+    showSyncStatus('Syncing...');
+    await syncAllFromCloud();
+    showSyncStatus('Synced ✓', true);
+    loadTodayDraft();
+    renderPlanWeek();
+    renderSummaryWeekNav();
+    renderHistory();
+    updatePlanPeek();
+  }
+}
+
+function showSyncStatus(msg, fadeOut) {
+  let el = document.getElementById('sync-status');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-status';
+    el.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--forest);color:white;font-size:11px;font-weight:600;padding:4px 14px;border-radius:0 0 10px 10px;z-index:999;transition:opacity 0.5s;font-family:Inter,sans-serif;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  if (fadeOut) {
+    setTimeout(() => { el.style.opacity = '0'; }, 2000);
+  }
+}
+
+// ─── WEEK HELPERS ──────────────────────────────────────────────────
+// Base week: Mon 22 Jun 2026 — the journal starts here
+const BASE_MONDAY = new Date('2026-06-22T00:00:00');
+
+function getMonday(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+// Returns the 7 dates (Mon–Sun) for a given offset from BASE_MONDAY
+function getWeekDates(offset = 0) {
+  const mon = new Date(BASE_MONDAY);
+  mon.setDate(mon.getDate() + offset * 7);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    days.push(d);
+  }
+  return days;
+}
+
+// Which offset is the current real week relative to BASE_MONDAY?
+function currentWeekOffset() {
+  const todayMon = getMonday(new Date());
+  const diff = Math.round((todayMon - BASE_MONDAY) / (7 * 24 * 60 * 60 * 1000));
+  return diff;
+}
+
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function todayKey() { return dateKey(new Date()); }
+
+function weekLabel(offset) {
+  const cwo = currentWeekOffset();
+  if (offset === cwo) return 'This Week';
+  if (offset === cwo - 1) return 'Last Week';
+  if (offset === cwo + 1) return 'Next Week';
+  if (offset < cwo) return `${cwo - offset} Weeks Ago`;
+  return `${offset - cwo} Weeks Ahead`;
+}
+
+function weekDatesStr(days) {
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return `${fmt(days[0])} – ${fmt(days[6])}`;
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'ref') renderRef();
+  if (name === 'plan') renderPlanWeek();
+  if (name === 'history') renderHistory();
+  if (name === 'log') updatePlanPeek();
+  if (name === 'summary') renderSummaryWeekNav();
+}
+
+function shiftWeek(dir, context) {
+  if (context === 'plan') {
+    planWeekOffset += dir;
+    renderPlanWeek();
+  } else {
+    sumWeekOffset += dir;
+    renderSummaryWeekNav();
+    document.getElementById('summary-output').innerHTML = '';
+  }
+}
+
+// ─── DOG THEME ────────────────────────────────────────────────────
+function selectDog(dog) {
+  currentDog = dog;
+  updateDogTheme();
+  loadTodayDraft();
+  updatePlanPeek();
+}
+
+function updateDogTheme() {
+  document.getElementById('tab-zuri').className = 'dog-tab' + (currentDog==='zuri' ? ' active-zuri' : '');
+  document.getElementById('tab-paxton').className = 'dog-tab' + (currentDog==='paxton' ? ' active-paxton' : '');
+  const c = currentDog;
+  document.getElementById('log-label').textContent = c === 'zuri' ? '🟣 ZURI — TRAINING SESSION' : '🩵 PAXTON — TRAINING SESSION';
+  document.getElementById('log-label').className = 'card-label ' + c;
+  document.getElementById('wins-label').className = 'card-label ' + c;
+  document.getElementById('challenges-label').className = 'card-label ' + c;
+  document.getElementById('save-btn').className = 'save-btn ' + c;
+  ['win-dot-1','win-dot-2','win-dot-3'].forEach(id => document.getElementById(id).className = 'num-dot ' + c);
+  ['ch-dot-1','ch-dot-2'].forEach(id => document.getElementById(id).className = 'num-dot red ' + c);
+  // topic chips
+  document.querySelectorAll('.chip').forEach(ch => {
+    ch.classList.remove('on-zuri','on-paxton');
+    if (selectedTopics.includes(ch.dataset.topic)) ch.classList.add('on-' + c);
+  });
+  // slot tab rows — Zuri gets 2 slots, Paxton gets 3
+  document.getElementById('session-slot-tabs-zuri').style.display = c === 'zuri' ? 'flex' : 'none';
+  document.getElementById('session-slot-tabs-paxton').style.display = c === 'paxton' ? 'flex' : 'none';
+  // plan peek visibility
+  document.getElementById('plan-peek-zuri').style.display = c === 'zuri' ? 'block' : 'none';
+  document.getElementById('plan-peek-paxton').style.display = c === 'paxton' ? 'block' : 'none';
+  // reset to morning slot on dog switch
+  currentSlot = 'morning';
+  // reset active tab visuals
+  if (c === 'zuri') {
+    ['slot-morning','slot-afternoon'].forEach((id,i) => {
+      const el = document.getElementById(id);
+      if (el) el.className = `slot-tab${i===0?' active':''} zuri`;
+    });
+  } else {
+    ['slot-morning-p','slot-midday-p','slot-afternoon-p'].forEach((id,i) => {
+      const el = document.getElementById(id);
+      if (el) el.className = `slot-tab${i===0?' active':''} paxton`;
+    });
+  }
+}
+
+// ─── PLAN WEEK RENDER ─────────────────────────────────────────────
+function renderPlanWeek() {
+  const days = getWeekDates(planWeekOffset);
+  document.getElementById('plan-week-label').textContent = weekLabel(planWeekOffset);
+  document.getElementById('plan-week-dates').textContent = weekDatesStr(days);
+
+  const today = todayKey();
+  const container = document.getElementById('plan-days-container');
+  container.innerHTML = '';
+
+  days.forEach((date, i) => {
+    const dk = dateKey(date);
+    const isToday = dk === today;
+    const dayName = DAYS[i];
+    const dateStr = date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+    const zuriMorning = getPlanSlot(dk, 'zuri', 'morning');
+    const zuriAfternoon = getPlanSlot(dk, 'zuri', 'afternoon');
+    const zuriTreatment = getPlanSlot(dk, 'zuri', 'treatment');
+    const zuriTreatmentNotes = getPlanSlot(dk, 'zuri', 'treatment-notes');
+    const paxMorning = getPlanSlot(dk, 'paxton', 'morning');
+    const paxMidday = getPlanSlot(dk, 'paxton', 'midday');
+    const paxAfternoon = getPlanSlot(dk, 'paxton', 'afternoon');
+    const paxTreatment = getPlanSlot(dk, 'paxton', 'treatment');
+    const paxTreatmentNotes = getPlanSlot(dk, 'paxton', 'treatment-notes');
+    const zuriPlan = zuriMorning || zuriAfternoon;
+    const paxPlan = paxMorning || paxMidday || paxAfternoon;
+    const loggedZ = hasLog(dk, 'zuri');
+    const loggedP = hasLog(dk, 'paxton');
+
+    // Build status badges
+    let badges = '';
+    const zStatus = loggedZ ? 'logged' : (zuriPlan ? 'has-plan zuri' : 'planned');
+    const zLabel = loggedZ ? '✓ Zuri' : (zuriPlan ? '🟣 Zuri' : '—');
+    const pStatus = loggedP ? 'logged' : (paxPlan ? 'has-plan paxton' : 'planned');
+    const pLabel = loggedP ? '✓ Paxton' : (paxPlan ? '🩵 Paxton' : '—');
+    badges = `<div class="day-badge">
+      <div class="day-status ${zStatus}">${zLabel}</div>
+      <div class="day-status ${pStatus}">${pLabel}</div>
+    </div>`;
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    const bodyOpen = isToday ? ' open' : '';
+    const headerClass = isToday ? 'day-card-header today-day open-header' : 'day-card-header';
+    const chevron = isToday ? '▲' : '▼';
+    card.innerHTML = `
+      <div class="${headerClass}" onclick="toggleDayCard('day-body-${i}', this)">
+        <div>
+          <div class="day-name">${dayName}${isToday ? ' <span style="font-size:11px;color:var(--zuri);font-weight:600;">Today</span>' : ''}</div>
+          <div class="day-date-tag">${dateStr}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${badges}
+          <span class="day-card-chevron">${chevron}</span>
+        </div>
+      </div>
+      <div class="day-card-body${bodyOpen}" id="day-body-${i}">
+        <div style="margin-top:4px;">
+          <div style="font-size:11px;font-weight:700;color:var(--zuri);text-transform:uppercase;letter-spacing:0.6px;margin:10px 0 8px;">🟣 Zuri</div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+            <input type="text" id="plan-${dk}-zuri-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(zuriTreatment)}" oninput="savePlanSlot('${dk}','zuri','treatment',this)">
+            <textarea id="plan-${dk}-zuri-treatment-notes" placeholder="Overall feedback — how she responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','zuri','treatment-notes',this)">${escHtml(zuriTreatmentNotes)}</textarea>
+          </div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+            <textarea id="plan-${dk}-zuri-morning" placeholder="Zuri morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','morning',this)">${escHtml(zuriMorning)}</textarea>
+          </div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+            <textarea id="plan-${dk}-zuri-afternoon" placeholder="Zuri afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','afternoon',this)">${escHtml(zuriAfternoon)}</textarea>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--paxton);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">🩵 Paxton</div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+            <input type="text" id="plan-${dk}-paxton-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(paxTreatment)}" oninput="savePlanSlot('${dk}','paxton','treatment',this)">
+            <textarea id="plan-${dk}-paxton-treatment-notes" placeholder="Overall feedback — how he responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','paxton','treatment-notes',this)">${escHtml(paxTreatmentNotes)}</textarea>
+          </div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+            <textarea id="plan-${dk}-paxton-morning" placeholder="Paxton morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','morning',this)">${escHtml(paxMorning)}</textarea>
+          </div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><div class="plan-slot-dot midday"></div> Midday</div>
+            <textarea id="plan-${dk}-paxton-midday" placeholder="Paxton midday session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','midday',this)">${escHtml(paxMidday)}</textarea>
+          </div>
+          <div class="plan-slot-block">
+            <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+            <textarea id="plan-${dk}-paxton-afternoon" placeholder="Paxton afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','afternoon',this)">${escHtml(paxAfternoon)}</textarea>
+          </div>
+        </div>
+        ${(loggedZ || loggedP) ? '<div style="margin-top:12px;font-size:12px;color:var(--text-light);font-weight:600;">Session logged' + (loggedZ && loggedP ? ' for both dogs' : loggedZ ? ' for Zuri' : ' for Paxton') + ' \u2713</div>' : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleDayCard(id, header) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+  const isOpen = el.classList.contains('open');
+  if (header) {
+    header.classList.toggle('open-header', isOpen);
+    const chevron = header.querySelector('.day-card-chevron');
+    if (chevron) chevron.textContent = isOpen ? '▲' : '▼';
+  }
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── PLAN STORAGE (slot-based) ────────────────────────────────────
+function planSlotKey(dateStr, dog, slot) { return 'plan-' + dateStr + '-' + dog + '-' + slot; }
+function getPlanSlot(dateStr, dog, slot) { return localStorage.getItem(planSlotKey(dateStr, dog, slot)) || ''; }
+// Legacy single-key getter (for backward compat)
+function getPlanForDay(dateStr, dog) {
+  return getPlanSlot(dateStr,dog,'morning') || getPlanSlot(dateStr,dog,'afternoon') || getPlanSlot(dateStr,dog,'midday') || '';
+}
+function savePlanSlot(dateStr, dog, slot, el) {
+  const element = el || document.getElementById('plan-' + dateStr + '-' + dog + '-' + slot);
+  if (element) { cloudSet(planSlotKey(dateStr, dog, slot), element.value); }
+  updatePlanPeek();
+}
+
+// ─── PLAN PEEK in Today ───────────────────────────────────────────
+let currentSlot = 'morning';
+
+function updatePlanPeek() {
+  const dk = todayKey();
+  const zuriSlots = ['morning','afternoon','treatment'];
+  const paxtonSlots = ['morning','midday','afternoon','treatment'];
+  [['zuri', zuriSlots], ['paxton', paxtonSlots]].forEach(([dog, slots]) => {
+    slots.forEach(slot => {
+      const el = document.getElementById(`peek-${dog}-${slot}`);
+      const wrapEl = document.getElementById(`peek-slot-${dog}-treatment`);
+      const v = getPlanSlot(dk, dog, slot);
+      if (el) {
+        el.textContent = v || (slot === 'treatment' ? '' : 'Not planned');
+        el.className = 'plan-peek-slot-text' + (v ? '' : ' empty');
+      }
+      if (slot === 'treatment' && wrapEl) {
+        wrapEl.style.display = v ? 'block' : 'none';
+      }
+    });
+  });
+}
+
+function selectSlot(slot) {
+  currentSlot = slot;
+  const dog = currentDog;
+  // Update tab active states
+  const tabIds = dog === 'zuri'
+    ? { morning: 'slot-morning', afternoon: 'slot-afternoon' }
+    : { morning: 'slot-morning-p', midday: 'slot-midday-p', afternoon: 'slot-afternoon-p' };
+  Object.entries(tabIds).forEach(([s, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.className = `slot-tab${s === slot ? ' active' : ''} ${dog}`;
+  });
+  loadTodayDraft();
+}
+
+// ─── LOG DRAFT STORAGE ────────────────────────────────────────────
+function draftKey() { return `draft-${currentDog}-${todayKey()}-${currentSlot}`; }
+
+function autoSave() {
+  const draft = {
+    training: val('l-training'), topics: [...selectedTopics],
+    win1: val('l-win1'), win2: val('l-win2'), win3: val('l-win3'),
+    ch1: val('l-ch1'), ch2: val('l-ch2'),
+    workon: val('l-workon'), videos: val('l-videos'), dave: val('l-dave'),
+  };
+  cloudSet(draftKey(), JSON.stringify(draft));
+}
+
+function loadTodayDraft() {
+  const d = JSON.parse(localStorage.getItem(draftKey()) || '{}');
+  setVal('l-training', d.training);
+  setVal('l-win1', d.win1); setVal('l-win2', d.win2); setVal('l-win3', d.win3);
+  setVal('l-ch1', d.ch1); setVal('l-ch2', d.ch2);
+  setVal('l-workon', d.workon); setVal('l-videos', d.videos); setVal('l-dave', d.dave);
+  loadTopics(d.topics || []);
+}
+
+function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+
+['l-training','l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon','l-videos','l-dave'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', autoSave);
+});
+
+// ─── TOPICS ───────────────────────────────────────────────────────
+function toggleChip(btn, name) {
+  btn.dataset.topic = name;
+  const cls = 'on-' + currentDog;
+  if (btn.classList.contains(cls)) {
+    btn.classList.remove(cls);
+    selectedTopics = selectedTopics.filter(t => t !== name);
+  } else {
+    btn.classList.add(cls);
+    if (!selectedTopics.includes(name)) selectedTopics.push(name);
+  }
+  autoSave();
+}
+
+function addTopic() {
+  const input = document.getElementById('custom-topic');
+  const name = input.value.trim();
+  if (!name || selectedTopics.includes(name)) { input.value = ''; return; }
+  const chips = document.getElementById('topic-chips');
+  const btn = document.createElement('button');
+  btn.className = 'chip on-' + currentDog;
+  btn.dataset.topic = name;
+  btn.textContent = name + ' ✕';
+  btn.onclick = () => { selectedTopics = selectedTopics.filter(t => t !== name); btn.remove(); autoSave(); };
+  chips.appendChild(btn);
+  selectedTopics.push(name);
+  input.value = '';
+  autoSave();
+}
+
+function loadTopics(topics) {
+  selectedTopics = [];
+  document.querySelectorAll('#topic-chips .chip').forEach(btn => btn.classList.remove('on-zuri','on-paxton'));
+  document.querySelectorAll('#topic-chips .chip[data-custom]').forEach(btn => btn.remove());
+  topics.forEach(name => {
+    let found = false;
+    document.querySelectorAll('#topic-chips .chip').forEach(btn => {
+      if (btn.dataset.topic === name || btn.textContent.trim() === name) {
+        btn.dataset.topic = name;
+        btn.classList.add('on-' + currentDog);
+        found = true;
+      }
+    });
+    if (!found) {
+      const chips = document.getElementById('topic-chips');
+      const btn = document.createElement('button');
+      btn.className = 'chip on-' + currentDog;
+      btn.dataset.topic = name;
+      btn.setAttribute('data-custom','1');
+      btn.textContent = name + ' ✕';
+      btn.onclick = () => { selectedTopics = selectedTopics.filter(t => t !== name); btn.remove(); autoSave(); };
+      chips.appendChild(btn);
+    }
+    selectedTopics.push(name);
+  });
+}
+
+// ─── SAVE ENTRY ───────────────────────────────────────────────────
+function saveEntry() {
+  const training = val('l-training').trim();
+  if (!training) { showToast('Add some training notes first!'); return; }
+  const entry = {
+    id: Date.now(), dog: currentDog, date: todayKey(),
+    session: currentSlot,
+    training,
+    topics: [...selectedTopics],
+    wins: [val('l-win1'),val('l-win2'),val('l-win3')].map(s=>s.trim()).filter(Boolean),
+    challenges: [val('l-ch1'),val('l-ch2')].map(s=>s.trim()).filter(Boolean),
+    workon: val('l-workon').trim(),
+    videos: val('l-videos').trim(),
+    dave: val('l-dave').trim(),
+  };
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.dog === currentDog && e.date === entry.date && e.session === currentSlot);
+  if (idx >= 0) entries.splice(idx, 1);
+  entries.unshift(entry);
+  saveEntries(entries);
+  cloudSet(draftKey(), '{}'); // clear draft in cloud too
+  clearForm();
+  showToast(`${currentDog === 'zuri' ? 'Zuri' : 'Paxton'}'s ${currentSlot} session saved! 🐾`);
+  renderPlanWeek();
+}
+
+function clearForm() {
+  ['l-training','l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon','l-videos','l-dave'].forEach(id => setVal(id,''));
+  loadTopics([]);
+  clearScreenshot();
+}
+
+function getEntries() { return JSON.parse(localStorage.getItem('entries') || '[]'); }
+function saveEntries(e) { cloudSet('entries', JSON.stringify(e)); }
+function hasLog(dateStr, dog) { return getEntries().some(e => e.date === dateStr && e.dog === dog); }
+
+// ─── HISTORY ──────────────────────────────────────────────────────
+function filterHistory(filter, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.className = 'filter-chip');
+  btn.classList.add('on-' + filter);
+  renderHistory(filter);
+}
+
+function renderHistory(filter = 'all') {
+  const list = document.getElementById('history-list');
+  const entries = getEntries();
+  const filtered = filter === 'all' ? entries : entries.filter(e => e.dog === filter);
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions yet</h3><p>Log your first training session to see it here.</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const dStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+    const slotLabel = e.session ? ` ${slotIcon} ${e.session.charAt(0).toUpperCase() + e.session.slice(1)}` : '';
+    const pills = e.wins.slice(0,2).map(w=>`<div class="pill">${w.substring(0,28)}${w.length>28?'…':''}</div>`).join('');
+    return `<div class="entry-card" onclick="openEntry(${e.id})">
+      <div class="entry-header">
+        <div class="entry-date">${dStr}<span style="font-size:11px;font-weight:600;color:var(--text-light);margin-left:6px;">${slotLabel}</span></div>
+        <div class="dog-badge ${e.dog}">${e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton'}</div>
+      </div>
+      <div class="entry-preview">${e.training}</div>
+      ${pills ? `<div class="pill-row">${pills}</div>` : ''}
+      ${e.dave ? '<div style="margin-top:5px;font-size:11px;color:var(--paxton);font-weight:600;">💬 Dave\'s feedback</div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function openEntry(id) {
+  const e = getEntries().find(x => x.id === id);
+  if (!e) return;
+  const d = new Date(e.date+'T12:00:00');
+  const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+  const slotStr = e.session ? ` — ${slotIcon} ${e.session.charAt(0).toUpperCase() + e.session.slice(1)}` : '';
+  document.getElementById('m-badge').textContent = e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton';
+  document.getElementById('m-badge').className = 'dog-badge ' + e.dog;
+  document.getElementById('m-title').textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + slotStr;
+  const winsHtml = e.wins.length ? `<ul>${e.wins.map(w=>`<li>${w}</li>`).join('')}</ul>` : '<p style="color:var(--text-light)">None</p>';
+  const chHtml = e.challenges&&e.challenges.length ? `<ul>${e.challenges.map(c=>`<li>${c}</li>`).join('')}</ul>` : '<p style="color:var(--text-light)">None</p>';
+  const topicsHtml = e.topics&&e.topics.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${e.topics.map(t=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:var(--parchment);border:1px solid var(--border);color:var(--text-mid);font-weight:600;">${t}</span>`).join('')}</div>` : '';
+  document.getElementById('m-body').innerHTML = `
+    <div class="modal-section"><h4 class="${e.dog}">Training Session</h4><p>${e.training}</p></div>
+    ${topicsHtml ? `<div class="divider"></div><div class="modal-section"><h4 class="neutral">🏷️ Topics</h4>${topicsHtml}</div>` : ''}
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="${e.dog}">✨ Wins</h4>${winsHtml}</div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">⚠️ Challenges</h4>${chHtml}</div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">🎯 Work On Next</h4><p>${e.workon||'<span style="color:var(--text-light)">Not recorded</span>'}</p></div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">📹 Videos to Dave</h4><p>${e.videos||'<span style="color:var(--text-light)">None</span>'}</p></div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">💬 Dave's Feedback</h4>
+      <div class="feedback-area"><textarea id="m-dave" style="min-height:70px;">${e.dave||''}</textarea>
+      <button class="save-feedback-btn" onclick="saveFeedback(${id})">Save Feedback</button></div>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function saveFeedback(id) {
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  entries[idx].dave = document.getElementById('m-dave').value;
+  saveEntries(entries); // already goes to cloud via saveEntries
+  showToast('Feedback saved!');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); renderHistory(); }
+
+// ─── SUMMARY ──────────────────────────────────────────────────────
+function renderSummaryWeekNav() {
+  const days = getWeekDates(sumWeekOffset);
+  document.getElementById('sum-week-label').textContent = weekLabel(sumWeekOffset);
+  document.getElementById('sum-week-dates').textContent = weekDatesStr(days);
+  document.getElementById('weight-week-tag').textContent = weekDatesStr(days);
+  loadWeights();
+}
+
+// ─── WEIGHT TRACKING ──────────────────────────────────────────────
+function weightKey() {
+  const days = getWeekDates(sumWeekOffset);
+  return 'weight-' + dateKey(days[0]);
+}
+
+function saveWeights() {
+  const data = {
+    zuri: document.getElementById('w-zuri').value,
+    paxton: document.getElementById('w-paxton').value,
+    notes: document.getElementById('w-notes').value,
+  };
+  cloudSet(weightKey(), JSON.stringify(data));
+  showWeightDiff();
+}
+
+function loadWeights() {
+  const data = JSON.parse(localStorage.getItem(weightKey()) || '{}');
+  document.getElementById('w-zuri').value = data.zuri || '';
+  document.getElementById('w-paxton').value = data.paxton || '';
+  document.getElementById('w-notes').value = data.notes || '';
+  showWeightDiff();
+  // Hide history when switching weeks
+  document.getElementById('w-history').style.display = 'none';
+  document.getElementById('w-hist-btn').textContent = '📊 Show weight history ▸';
+}
+
+function showWeightDiff() {
+  // Compare to previous week
+  const prevOffset = sumWeekOffset - 1;
+  const prevDays = getWeekDates(prevOffset);
+  const prevKey = 'weight-' + dateKey(prevDays[0]);
+  const prev = JSON.parse(localStorage.getItem(prevKey) || '{}');
+
+  const renderDiff = (currentVal, prevVal, elId) => {
+    const el = document.getElementById(elId);
+    if (!currentVal || !prevVal) { el.textContent = prevVal ? `Prev: ${prevVal} kg` : ''; el.style.color = 'var(--text-light)'; return; }
+    const diff = (parseFloat(currentVal) - parseFloat(prevVal)).toFixed(1);
+    const isDown = diff < 0;
+    const isUp = diff > 0;
+    el.textContent = isDown ? `▼ ${Math.abs(diff)} kg from last week` : isUp ? `▲ +${diff} kg from last week` : `= Same as last week`;
+    el.style.color = isDown ? '#2e7d32' : isUp ? 'var(--red)' : 'var(--text-light)';
+  };
+
+  renderDiff(document.getElementById('w-zuri').value, prev.zuri, 'w-zuri-diff');
+  renderDiff(document.getElementById('w-paxton').value, prev.paxton, 'w-paxton-diff');
+}
+
+function toggleWeightHistory() {
+  const box = document.getElementById('w-history');
+  const btn = document.getElementById('w-hist-btn');
+  if (box.style.display === 'none') {
+    box.style.display = 'block';
+    btn.textContent = '📊 Hide weight history ▴';
+    renderWeightHistory();
+  } else {
+    box.style.display = 'none';
+    btn.textContent = '📊 Show weight history ▸';
+  }
+}
+
+function renderWeightHistory() {
+  const box = document.getElementById('w-history');
+  // Gather all weight keys
+  const all = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('weight-')) {
+      const d = JSON.parse(localStorage.getItem(k) || '{}');
+      if (d.zuri || d.paxton) all.push({ weekStart: k.replace('weight-',''), ...d });
+    }
+  }
+  all.sort((a,b) => b.weekStart.localeCompare(a.weekStart));
+
+  if (!all.length) { box.innerHTML = '<div style="font-size:13px;color:var(--text-light);padding:6px 0;">No weight data recorded yet.</div>'; return; }
+
+  box.innerHTML = `<div style="border-top:1px solid var(--border);padding-top:10px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-bottom:8px;">All Recorded Weights</div>
+    ${all.map(w => {
+      const d = new Date(w.weekStart + 'T12:00:00');
+      const wkLabel = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text-mid);font-weight:600;">Wk of ${wkLabel}</div>
+        <div style="display:flex;gap:14px;">
+          ${w.zuri ? `<span style="font-size:13px;font-weight:700;color:var(--zuri);">🟣 ${w.zuri} kg</span>` : ''}
+          ${w.paxton ? `<span style="font-size:13px;font-weight:700;color:var(--paxton);">🩵 ${w.paxton} kg</span>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function generateSummary() {
+  const days = getWeekDates(sumWeekOffset);
+  const dateKeys = days.map(d => dateKey(d));
+  const allEntries = getEntries();
+  const weekEntries = allEntries.filter(e => dateKeys.includes(e.date));
+  const output = document.getElementById('summary-output');
+
+  if (!weekEntries.length) {
+    output.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions this week</h3><p>Log some sessions first, then generate the summary.</p></div>`;
+    return;
+  }
+
+  output.innerHTML = '<div class="loading-box"><div class="spinner"></div>Generating summary…</div>';
+
+  const zuriE = weekEntries.filter(e => e.dog === 'zuri');
+  const paxE = weekEntries.filter(e => e.dog === 'paxton');
+
+  // Build daily breakdown string — multiple sessions per day
+  const buildDayLines = (allEntries, days, dog) => {
+    return days.map((d, i) => {
+      const dk = dateKey(d);
+      const dayEntries = allEntries.filter(x => x.date === dk);
+      const slots = dog === 'zuri' ? ['morning','afternoon'] : ['morning','midday','afternoon'];
+      const planLines = slots.map(slot => {
+        const p = getPlanSlot(dk, dog, slot);
+        return p ? `    ${slot}: ${p}` : '';
+      }).filter(Boolean).join('\n');
+      if (!dayEntries.length) return `${DAYS[i]} (${dk}): No session logged.\n  Plan:\n${planLines || '    none'}`;
+      const sessionLines = slots.map(slot => {
+        const e = dayEntries.find(x => x.session === slot) || dayEntries.find(x => !x.session && slot === 'morning');
+        if (!e) return `    ${slot}: not logged`;
+        return `    ${slot}:\n      Training: ${e.training}\n      Topics: ${(e.topics||[]).join(', ')||'none'}\n      Wins: ${e.wins.join(' | ')||'none'}\n      Challenges: ${(e.challenges||[]).join(' | ')||'none'}\n      Work on: ${e.workon||'none'}`;
+      }).join('\n');
+      const daveEntry = dayEntries.find(x => x.dave);
+      const videosEntry = dayEntries.find(x => x.videos);
+      const dave = daveEntry ? daveEntry.dave : 'none';
+      const videos = videosEntry ? videosEntry.videos : 'none';
+      const treatment = getPlanSlot(dk, dog, 'treatment');
+      return `${DAYS[i]} (${dk}):\n  Treatment: ${treatment||'none'}\n  Plan:\n${planLines||'    none'}\n  Sessions:\n${sessionLines}\n  Videos to Dave: ${videos}\n  Dave feedback: ${dave}`;
+    }).join('\n\n');
+  };
+
+  const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
+  const weightLine = `Zuri: ${weightData.zuri ? weightData.zuri + ' kg' : 'not recorded'}, Paxton: ${weightData.paxton ? weightData.paxton + ' kg' : 'not recorded'}${weightData.notes ? '. Notes: ' + weightData.notes : ''}`;
+
+  const prompt = `You are an expert dog training coach reviewing a week of training logs. Produce a thorough, structured weekly summary.
+
+WEEK: ${weekDatesStr(days)}
+WEIGHTS THIS WEEK: ${weightLine}
+
+=== ZURI (${zuriE.length} sessions logged — morning & afternoon) ===
+${buildDayLines(zuriE, days, 'zuri')}
+
+=== PAXTON (${paxE.length} sessions logged — morning, midday & afternoon) ===
+${buildDayLines(paxE, days, 'paxton')}
+
+Respond ONLY with a JSON object (no markdown, no backticks):
+{
+  "week_theme": "One overarching theme or headline for this training week",
+  "zuri_overall": "2-3 sentences on Zuri's week overall — consistency, energy, progress",
+  "zuri_wins": "The standout wins for Zuri this week",
+  "zuri_challenges": "Key challenges for Zuri and what they indicate",
+  "zuri_next_week": "2-3 specific things to focus on with Zuri next week",
+  "paxton_overall": "2-3 sentences on Paxton's week overall",
+  "paxton_wins": "The standout wins for Paxton this week",
+  "paxton_challenges": "Key challenges for Paxton and what they indicate",
+  "paxton_next_week": "2-3 specific things to focus on with Paxton next week",
+  "weight_notes": "Brief comment on their weights this week if recorded — trends, whether on track, anything to watch",
+  "dave_themes": "Summary of Dave's coaching themes from feedback this week (or 'No feedback recorded' if none)",
+  "treatment_notes": "Any physio/massage/treatment this week and how it may affect training (omit if none recorded)",
+  "sessions_missed": "Any days with no session logged and whether it matters",
+  "encouragement": "A warm, specific sentence of encouragement for the trainer based on this week"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const s = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    output.innerHTML = `
+      <div class="summary-card" style="background:linear-gradient(135deg,var(--zuri-light) 0%,var(--paxton-light) 100%);">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:5px;">✨ Week Theme</div>
+        <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--text-dark);line-height:1.3;">${s.week_theme}</div>
+      </div>
+
+      <div class="summary-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div class="dog-badge zuri">🟣 Zuri — ${zuriE.length} sessions</div></div>
+        <div class="summary-section"><h4>Overall</h4><p class="summary-text">${s.zuri_overall}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>✨ Wins</h4><p class="summary-text">${s.zuri_wins}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.zuri_challenges}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>🎯 Focus Next Week</h4><p class="summary-text">${s.zuri_next_week}</p></div>
+      </div>
+
+      <div class="summary-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div class="dog-badge paxton">🩵 Paxton — ${paxE.length} sessions</div></div>
+        <div class="summary-section"><h4>Overall</h4><p class="summary-text">${s.paxton_overall}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>✨ Wins</h4><p class="summary-text">${s.paxton_wins}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.paxton_challenges}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>🎯 Focus Next Week</h4><p class="summary-text">${s.paxton_next_week}</p></div>
+      </div>
+
+      <div class="summary-card">
+        ${s.treatment_notes ? `<div class="summary-section"><h4>💆 Treatment & Recovery</h4><p class="summary-text">${s.treatment_notes}</p></div><div class="divider"></div>` : ''}
+        ${s.weight_notes ? `<div class="summary-section"><h4>⚖️ Weight Check-in</h4><p class="summary-text">${s.weight_notes}</p></div><div class="divider"></div>` : ''}
+        ${s.dave_themes && s.dave_themes !== 'No feedback recorded' ? `<div class="summary-section"><h4>💬 Dave's Coaching Themes</h4><p class="summary-text">${s.dave_themes}</p></div><div class="divider"></div>` : ''}
+        ${s.sessions_missed ? `<div class="summary-section"><h4>📅 Sessions Missed</h4><p class="summary-text">${s.sessions_missed}</p></div><div class="divider"></div>` : ''}
+        <div class="summary-section"><p class="summary-text" style="font-style:italic;color:var(--zuri);">${s.encouragement}</p></div>
+      </div>
+    `;
+  } catch(err) {
+    output.innerHTML = `<div class="summary-card" style="color:#b91c1c;text-align:center;padding:20px;"><p style="font-size:14px;">Couldn't generate summary. Check your connection and try again.</p></div>`;
+  }
+}
+
+// ─── VOICE ────────────────────────────────────────────────────────
+function startVoice(targetId, btnId) {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { showToast('Voice not supported in this browser'); return; }
+  const btn = document.getElementById(btnId);
+  if (activeVoiceBtn === btn && recognition) { recognition.stop(); return; }
+  if (recognition) recognition.stop();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true; recognition.interimResults = false; recognition.lang = 'en-US';
+  activeVoiceBtn = btn;
+  btn.className = 'voice-btn listening';
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Listening… tap to stop`;
+  recognition.onresult = e => {
+    const t = Array.from(e.results).map(r=>r[0].transcript).join(' ');
+    const el = document.getElementById(targetId);
+    if (el) { el.value = (el.value ? el.value + ' ' : '') + t; autoSave(); }
+  };
+  recognition.onend = () => {
+    btn.className = 'voice-btn';
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak`;
+    activeVoiceBtn = null; recognition = null;
+  };
+  recognition.onerror = e => { showToast('Voice error: ' + e.error); recognition.stop(); };
+  recognition.start();
+}
+
+// ─── SCREENSHOT ───────────────────────────────────────────────────
+function handleScreenshot(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    screenshotB64 = ev.target.result.split(',')[1];
+    document.getElementById('ss-img').src = ev.target.result;
+    document.getElementById('ss-name').textContent = file.name;
+    document.getElementById('ss-preview').style.display = 'flex';
+    document.getElementById('ss-drop').style.display = 'none';
+  };
+  r.readAsDataURL(file);
+}
+
+function clearScreenshot() {
+  screenshotB64 = null;
+  document.getElementById('ss-input').value = '';
+  document.getElementById('ss-preview').style.display = 'none';
+  document.getElementById('ss-drop').style.display = 'block';
+}
+
+async function readScreenshot() {
+  if (!screenshotB64) return;
+  const btn = document.getElementById('ai-read-btn');
+  const status = document.getElementById('ai-read-status');
+  btn.disabled = true; btn.textContent = 'Reading…'; status.style.display = 'block';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: screenshotB64 } },
+        { type: 'text', text: 'This is a screenshot of feedback from a dog trainer named Dave. Transcribe all text exactly, then write "---" and a concise summary of his key points.' }
+      ]}]})
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const existing = val('l-dave').trim();
+    setVal('l-dave', existing ? existing + '\n\n' + text : text);
+    autoSave(); showToast('Screenshot read! 📋');
+  } catch { showToast('Could not read screenshot.'); }
+  finally { btn.disabled = false; btn.textContent = '✨ Read with AI'; status.style.display = 'none'; }
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+
+// ─── REFERENCE: Dave's Notes & Videos ────────────────────────────
+let refFilter = 'all';
+
+function filterRef(filter, btn) {
+  refFilter = filter;
+  document.querySelectorAll('.ref-filter-row .filter-chip').forEach(c => c.className = 'filter-chip');
+  const colorClass = filter === 'zuri' ? 'on-zuri' : filter === 'paxton' ? 'on-paxton' : 'on-all';
+  btn.classList.add(colorClass);
+  renderRef();
+}
+
+function renderRef() {
+  const list = document.getElementById('ref-list');
+  if (!list) return;
+  const entries = getEntries();
+
+  const filtered = entries.filter(e => {
+    const hasDave = e.dave && e.dave.trim();
+    const hasVideos = e.videos && e.videos.trim();
+    const hasTreatment = getPlanSlot(e.date, e.dog, 'treatment');
+    if (refFilter === 'zuri') return e.dog === 'zuri' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'paxton') return e.dog === 'paxton' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'dave') return hasDave;
+    if (refFilter === 'videos') return hasVideos;
+    return hasDave || hasVideos || hasTreatment;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="ref-empty"><div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-weight:700;color:var(--text-mid);margin-bottom:6px;">Nothing here yet</div><div>Log sessions with Dave's feedback, videos sent, or treatment notes and they'll appear here for easy reference.</div></div>';
+    return;
+  }
+
+  // Group by Mon–Sun week
+  const weekGroups = {};
+  filtered.forEach(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const mon = getMonday(d);
+    const wk = dateKey(mon);
+    if (!weekGroups[wk]) weekGroups[wk] = [];
+    weekGroups[wk].push(e);
+  });
+
+  const sortedWeeks = Object.keys(weekGroups).sort((a,b) => b.localeCompare(a));
+
+  list.innerHTML = sortedWeeks.map(wk => {
+    const mon = new Date(wk + 'T12:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const wkLabel = fmt(mon) + ' – ' + fmt(sun) + ', ' + mon.getFullYear();
+
+    const groupEntries = weekGroups[wk].sort((a,b) => a.date.localeCompare(b.date) || (a.session||'').localeCompare(b.session||''));
+
+    const cards = groupEntries.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const dStr = d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+      const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+      const slotStr = e.session ? slotIcon + ' ' + e.session.charAt(0).toUpperCase() + e.session.slice(1) : '';
+      const hasDave = e.dave && e.dave.trim();
+      const hasVideos = e.videos && e.videos.trim();
+      const treatment = getPlanSlot(e.date, e.dog, 'treatment');
+      const treatmentNotes = getPlanSlot(e.date, e.dog, 'treatment-notes');
+
+      if (!hasDave && !hasVideos && !treatment) return '';
+
+      return '<div class="ref-entry">' +
+        '<div class="ref-entry-header">' +
+          '<div class="dog-badge ' + e.dog + '">' + (e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton') + '</div>' +
+          '<div class="ref-date-tag">' + dStr + '</div>' +
+          (slotStr ? '<div class="ref-slot-tag">' + slotStr + '</div>' : '') +
+        '</div>' +
+        (treatment ? '<div class="ref-section"><div class="ref-label">💆 Treatment / Physio</div><div class="ref-text" style="color:var(--paxton);font-weight:600;">' + treatment + '</div>' + (treatmentNotes ? '<div class="ref-text" style="margin-top:5px;">' + treatmentNotes + '</div>' : '') + '</div>' : '') +
+        (hasVideos ? '<div class="ref-section"><div class="ref-label">📹 Videos Sent to Dave</div><div class="ref-text">' + e.videos + '</div></div>' : '') +
+        (hasDave ? '<div class="ref-section"><div class="ref-label">💬 Dave\'s Feedback</div><div class="ref-text">' + e.dave + '</div></div>' : '') +
+        '<div class="ref-section" style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;"><div class="ref-label">Training covered</div><div style="font-size:12px;color:var(--text-mid);line-height:1.4;">' + e.training.substring(0,100) + (e.training.length>100?'...':'') + '</div></div>' +
+        '</div>';
+    }).filter(Boolean).join('');
+
+    if (!cards) return '';
+    return '<div class="ref-week-group">' +
+      '<div class="ref-week-heading"><span>Week of ' + wkLabel + '</span><span style="font-size:11px;font-weight:600;color:var(--text-light);">' + groupEntries.length + ' entries</span></div>' +
+      cards +
+      '</div>';
+  }).filter(Boolean).join('');
+
+  if (!list.innerHTML.trim()) {
+    list.innerHTML = '<div class="ref-empty">No matching entries found for this filter.</div>';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
