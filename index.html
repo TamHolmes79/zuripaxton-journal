@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -233,6 +234,24 @@ textarea { min-height: 72px; }
 .ref-text { font-size: 13px; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 .ref-empty { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 13px; }
 .treatment-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; margin-right: 4px; }
+/* MULTI FEEDBACK & VIDEO */
+.feedback-item { background: var(--parchment); border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; border: 1px solid var(--border); }
+.feedback-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.feedback-who-input { font-size: 13px; font-weight: 700; color: var(--text-dark); border: none; background: transparent; padding: 0; width: 60%; font-family: 'Inter', sans-serif; }
+.feedback-who-input:focus { outline: none; border-bottom: 1.5px solid var(--zuri); }
+.remove-item-btn { font-size: 11px; color: var(--text-light); background: none; border: none; cursor: pointer; padding: 2px 6px; font-family: 'Inter', sans-serif; font-weight: 600; }
+.remove-item-btn:hover { color: var(--red); }
+.add-item-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: 8px; background: none; color: var(--text-light); font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; justify-content: center; font-family: 'Inter', sans-serif; margin-top: 6px; transition: all 0.15s; }
+.add-item-btn:hover { border-color: var(--zuri); color: var(--zuri); }
+.video-item { background: var(--parchment); border-radius: 10px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+.video-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.video-type-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--forest); color: white; }
+.video-url-input { font-size: 13px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; width: 100%; font-family: 'Inter', sans-serif; background: white; margin-bottom: 6px; color: var(--text-dark); }
+.video-url-input:focus { outline: none; border-color: var(--zuri); }
+.video-desc-input { font-size: 13px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; width: 100%; font-family: 'Inter', sans-serif; background: white; color: var(--text-dark); }
+.video-desc-input:focus { outline: none; border-color: var(--zuri); }
+.video-thumbnail { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; margin-top: 6px; display: none; }
+
 </style>
 </head>
 <body>
@@ -281,8 +300,14 @@ textarea { min-height: 72px; }
 
 <!-- ===== TODAY / LOG SCREEN ===== -->
 <div class="screen" id="screen-log">
-  <div class="screen-heading">Today's Session</div>
-  <div class="screen-sub" id="log-sub"></div>
+  <div class="screen-heading">Log a Session</div>
+
+  <!-- Date selector -->
+  <div class="card" style="margin-bottom:12px;padding:14px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:8px;">📅 Which day are you logging?</div>
+    <input type="date" id="log-date-picker" style="width:100%;padding:10px 12px;font-size:15px;font-weight:600;border:1.5px solid var(--border);border-radius:10px;font-family:Inter,sans-serif;color:var(--text-dark);background:var(--cream);-webkit-appearance:none;" onchange="onLogDateChange()">
+    <div id="log-date-label" style="font-size:12px;color:var(--text-light);margin-top:6px;text-align:center;"></div>
+  </div>
 
   <!-- Plan peek for today -->
   <div class="plan-peek" id="plan-peek-zuri">
@@ -333,9 +358,19 @@ textarea { min-height: 72px; }
 
   <div class="card">
     <div class="card-label" id="log-label">TRAINING SESSION</div>
-    <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:6px;">What training did you do today?</div>
-    <textarea id="l-training" placeholder="Describe the session…" rows="3"></textarea>
-    <button class="voice-btn" id="v-training" onclick="startVoice('l-training','v-training')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+    <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:10px;">What did you train? Add up to 5 topics for this session.</div>
+    <div id="session-topics-container">
+      <div class="num-row"><div class="num-dot zuri session-topic-dot" id="st-dot-1">1</div><input type="text" id="l-topic1" placeholder="Topic 1…" style="min-height:unset;padding:9px 12px;font-size:14px;"></div>
+      <div class="num-row"><div class="num-dot zuri session-topic-dot" id="st-dot-2">2</div><input type="text" id="l-topic2" placeholder="Topic 2…" style="min-height:unset;padding:9px 12px;font-size:14px;"></div>
+      <div class="num-row"><div class="num-dot zuri session-topic-dot" id="st-dot-3">3</div><input type="text" id="l-topic3" placeholder="Topic 3…" style="min-height:unset;padding:9px 12px;font-size:14px;"></div>
+      <div class="num-row"><div class="num-dot zuri session-topic-dot" id="st-dot-4">4</div><input type="text" id="l-topic4" placeholder="Topic 4 (optional)…" style="min-height:unset;padding:9px 12px;font-size:14px;"></div>
+      <div class="num-row"><div class="num-dot zuri session-topic-dot" id="st-dot-5">5</div><input type="text" id="l-topic5" placeholder="Topic 5 (optional)…" style="min-height:unset;padding:9px 12px;font-size:14px;"></div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:6px;">Overall session notes</div>
+      <textarea id="l-training" placeholder="Any extra notes about today's session…" rows="2" style="min-height:52px;"></textarea>
+      <button class="voice-btn" id="v-training" onclick="startVoice('l-training','v-training')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+    </div>
   </div>
 
   <div class="card">
@@ -356,7 +391,7 @@ textarea { min-height: 72px; }
     </div>
     <div style="display:flex;gap:8px;align-items:center;">
       <input type="text" id="custom-topic" placeholder="Add topic…" style="min-height:unset;padding:8px 12px;font-size:13px;" onkeydown="if(event.key==='Enter')addTopic()">
-      <button onclick="addTopic()" style="padding:8px 14px;background:var(--forest);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;">Add</button>
+      <button onclick="addTopic()" style="padding:8px 14px;background:var(--forest);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:Inter,sans-serif;">Add</button>
     </div>
   </div>
 
@@ -382,32 +417,17 @@ textarea { min-height: 72px; }
   </div>
 
   <div class="card">
-    <div class="card-label neutral">📹 VIDEOS SENT TO DAVE</div>
-    <textarea id="l-videos" placeholder="Which clips, what they show…" rows="2" style="min-height:60px;"></textarea>
-    <button class="voice-btn" id="v-videos" onclick="startVoice('l-videos','v-videos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak</button>
+    <div class="card-label neutral">📹 VIDEOS</div>
+    <div style="font-size:12px;color:var(--text-light);margin-bottom:10px;">Add YouTube links or describe videos sent. Add as many as you like.</div>
+    <div id="videos-container"></div>
+    <button class="add-item-btn" onclick="addVideo()">+ Add Video</button>
   </div>
 
   <div class="card">
-    <div class="card-label neutral">💬 DAVE'S FEEDBACK</div>
-    <div style="font-size:12px;color:var(--text-light);margin-bottom:8px;">Type, paste, or upload a screenshot of Dave's message.</div>
-    <div class="screenshot-drop" id="ss-drop" onclick="document.getElementById('ss-input').click()">
-      <div style="font-size:20px;margin-bottom:3px;">📷</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-mid);">Upload screenshot</div>
-      <div style="font-size:11px;color:var(--text-light);margin-top:2px;">Tap to choose from camera roll</div>
-      <input type="file" id="ss-input" accept="image/*" style="display:none" onchange="handleScreenshot(event)">
-    </div>
-    <div class="screenshot-preview" id="ss-preview">
-      <img id="ss-img" />
-      <div style="flex:1;">
-        <div style="font-size:12px;font-weight:600;color:var(--text-mid);" id="ss-name"></div>
-        <div style="display:flex;gap:6px;margin-top:6px;">
-          <button onclick="readScreenshot()" id="ai-read-btn" style="padding:6px 11px;background:var(--forest);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✨ Read with AI</button>
-          <button onclick="clearScreenshot()" style="padding:6px 10px;background:var(--parchment);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Remove</button>
-        </div>
-        <div id="ai-read-status" style="font-size:12px;color:var(--text-light);display:none;margin-top:4px;">Reading…</div>
-      </div>
-    </div>
-    <textarea id="l-dave" placeholder="Dave's notes, corrections, encouragement…" rows="3"></textarea>
+    <div class="card-label neutral">💬 FEEDBACK</div>
+    <div style="font-size:12px;color:var(--text-light);margin-bottom:10px;">Add feedback from Dave, your physio, vet, or anyone else. Add as many as you like.</div>
+    <div id="feedback-container"></div>
+    <button class="add-item-btn" onclick="addFeedback()">+ Add Feedback</button>
   </div>
 
   <button class="save-btn zuri" id="save-btn" onclick="saveEntry()">Save Today's Session</button>
@@ -464,7 +484,7 @@ textarea { min-height: 72px; }
       </div>
     </div>
     <textarea id="w-notes" placeholder="Weight notes — vet advice, diet changes, portion adjustments…" rows="2" style="min-height:56px;margin-top:12px;font-size:13px;" oninput="saveWeights()"></textarea>
-    <button onclick="toggleWeightHistory()" id="w-hist-btn" style="background:none;border:none;font-size:12px;color:var(--text-light);font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;margin-top:6px;display:block;">📊 Show weight history ▸</button>
+    <button onclick="toggleWeightHistory()" id="w-hist-btn" style="background:none;border:none;font-size:12px;color:var(--text-light);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;padding:4px 0;margin-top:6px;display:block;">📊 Show weight history ▸</button>
     <div id="w-history" style="display:none;margin-top:10px;"></div>
   </div>
 
@@ -570,6 +590,44 @@ async function syncAllFromCloud() {
   } catch(e) {}
 }
 
+// ─── LOG DATE ────────────────────────────────────────────────────
+function getLogDate() {
+  const picker = document.getElementById('log-date-picker');
+  return picker && picker.value ? picker.value : todayKey();
+}
+
+function onLogDateChange() {
+  const dk = getLogDate();
+  const d = new Date(dk + 'T12:00:00');
+  const isToday = dk === todayKey();
+  const label = document.getElementById('log-date-label');
+  if (label) {
+    label.textContent = isToday ? 'Today' : d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    label.style.color = isToday ? 'var(--paxton)' : 'var(--zuri)';
+  }
+  // Update plan peek for this date
+  updatePlanPeekForDate(dk);
+  // Load draft for this date/slot
+  loadTodayDraft();
+}
+
+function updatePlanPeekForDate(dk) {
+  ['zuri','paxton'].forEach(function(dog) {
+    ['morning','midday','afternoon','treatment'].forEach(function(slot) {
+      var el = document.getElementById('peek-' + dog + '-' + slot);
+      var wrapEl = document.getElementById('peek-slot-' + dog + '-treatment');
+      var v = getPlanSlot(dk, dog, slot);
+      if (el) {
+        el.textContent = v || (slot === 'treatment' ? '' : 'Not planned');
+        el.className = 'plan-peek-slot-text' + (v ? '' : ' empty');
+      }
+      if (slot === 'treatment' && wrapEl) {
+        wrapEl.style.display = v ? 'block' : 'none';
+      }
+    });
+  });
+}
+
 // ─── INIT ──────────────────────────────────────────────────────────
 async function init() {
   // Init Supabase (safe — won't crash if SDK not ready)
@@ -580,11 +638,24 @@ async function init() {
   sumWeekOffset = currentWeekOffset();
   const now = new Date();
   document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  document.getElementById('log-sub').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  // Set date picker to today
+  const picker = document.getElementById('log-date-picker');
+  if (picker) {
+    picker.value = todayKey();
+    const lbl = document.getElementById('log-date-label');
+    if (lbl) { lbl.textContent = 'Today'; lbl.style.color = 'var(--paxton)'; }
+  }
 
   // Render immediately from localStorage so UI appears instantly
   updateDogTheme();
   loadTodayDraft();
+  // Ensure feedback/video containers have at least one item
+  if (document.getElementById('feedback-container') && !document.getElementById('feedback-container').children.length) {
+    addFeedback('Dave', '');
+  }
+  if (document.getElementById('videos-container') && !document.getElementById('videos-container').children.length) {
+    addVideo('', '');
+  }
   renderPlanWeek();
   renderSummaryWeekNav();
   renderHistory();
@@ -704,6 +775,7 @@ function selectDog(dog) {
   updateDogTheme();
   loadTodayDraft();
   updatePlanPeek();
+  renderPlanWeek();
 }
 
 function updateDogTheme() {
@@ -717,6 +789,7 @@ function updateDogTheme() {
   document.getElementById('save-btn').className = 'save-btn ' + c;
   ['win-dot-1','win-dot-2','win-dot-3'].forEach(id => document.getElementById(id).className = 'num-dot ' + c);
   ['ch-dot-1','ch-dot-2'].forEach(id => document.getElementById(id).className = 'num-dot red ' + c);
+  ['st-dot-1','st-dot-2','st-dot-3','st-dot-4','st-dot-5'].forEach(id => { const el = document.getElementById(id); if(el) el.className = 'num-dot ' + c + ' session-topic-dot'; });
   // topic chips
   document.querySelectorAll('.chip').forEach(ch => {
     ch.classList.remove('on-zuri','on-paxton');
@@ -790,10 +863,60 @@ function renderPlanWeek() {
     const bodyOpen = isToday ? ' open' : '';
     const headerClass = isToday ? 'day-card-header today-day open-header' : 'day-card-header';
     const chevron = isToday ? '▲' : '▼';
+
+    // Only show the selected dog's badge and sections
+    const isZuri = currentDog === 'zuri';
+    const dogColor = isZuri ? 'var(--zuri)' : 'var(--paxton)';
+    const dogEmoji = isZuri ? '🟣 Zuri' : '🩵 Paxton';
+    const dogStatus = isZuri
+      ? (loggedZ ? 'logged' : (zuriPlan ? 'has-plan zuri' : 'planned'))
+      : (loggedP ? 'logged' : (paxPlan ? 'has-plan paxton' : 'planned'));
+    const dogLabel = isZuri
+      ? (loggedZ ? '✓ Zuri' : (zuriPlan ? '🟣 Zuri' : '🟣 Zuri'))
+      : (loggedP ? '✓ Paxton' : (paxPlan ? '🩵 Paxton' : '🩵 Paxton'));
+
+    badges = `<div class="day-badge"><div class="day-status ${dogStatus}">${dogLabel}</div></div>`;
+
+    const zuriSections = `
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+          <input type="text" id="plan-${dk}-zuri-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(zuriTreatment)}" oninput="savePlanSlot('${dk}','zuri','treatment',this)">
+          <textarea id="plan-${dk}-zuri-treatment-notes" placeholder="Overall feedback — how she responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','zuri','treatment-notes',this)">${escHtml(zuriTreatmentNotes)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+          <textarea id="plan-${dk}-zuri-morning" placeholder="Zuri morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','morning',this)">${escHtml(zuriMorning)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+          <textarea id="plan-${dk}-zuri-afternoon" placeholder="Zuri afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','afternoon',this)">${escHtml(zuriAfternoon)}</textarea>
+        </div>`;
+
+    const paxtonSections = `
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+          <input type="text" id="plan-${dk}-paxton-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(paxTreatment)}" oninput="savePlanSlot('${dk}','paxton','treatment',this)">
+          <textarea id="plan-${dk}-paxton-treatment-notes" placeholder="Overall feedback — how he responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','paxton','treatment-notes',this)">${escHtml(paxTreatmentNotes)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+          <textarea id="plan-${dk}-paxton-morning" placeholder="Paxton morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','morning',this)">${escHtml(paxMorning)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot midday"></div> Midday</div>
+          <textarea id="plan-${dk}-paxton-midday" placeholder="Paxton midday session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','midday',this)">${escHtml(paxMidday)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+          <textarea id="plan-${dk}-paxton-afternoon" placeholder="Paxton afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','afternoon',this)">${escHtml(paxAfternoon)}</textarea>
+        </div>`;
+
+    const loggedNote = (loggedZ || loggedP) ? '<div style="margin-top:12px;font-size:12px;color:var(--text-light);font-weight:600;">Session logged ✓</div>' : '';
+
     card.innerHTML = `
       <div class="${headerClass}" onclick="toggleDayCard('day-body-${i}', this)">
         <div>
-          <div class="day-name">${dayName}${isToday ? ' <span style="font-size:11px;color:var(--zuri);font-weight:600;">Today</span>' : ''}</div>
+          <div class="day-name">${dayName}${isToday ? ' <span style="font-size:11px;color:' + dogColor + ';font-weight:600;">Today</span>' : ''}</div>
           <div class="day-date-tag">${dateStr}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -803,42 +926,10 @@ function renderPlanWeek() {
       </div>
       <div class="day-card-body${bodyOpen}" id="day-body-${i}">
         <div style="margin-top:4px;">
-          <div style="font-size:11px;font-weight:700;color:var(--zuri);text-transform:uppercase;letter-spacing:0.6px;margin:10px 0 8px;">🟣 Zuri</div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
-            <input type="text" id="plan-${dk}-zuri-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(zuriTreatment)}" oninput="savePlanSlot('${dk}','zuri','treatment',this)">
-            <textarea id="plan-${dk}-zuri-treatment-notes" placeholder="Overall feedback — how she responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','zuri','treatment-notes',this)">${escHtml(zuriTreatmentNotes)}</textarea>
-          </div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
-            <textarea id="plan-${dk}-zuri-morning" placeholder="Zuri morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','morning',this)">${escHtml(zuriMorning)}</textarea>
-          </div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
-            <textarea id="plan-${dk}-zuri-afternoon" placeholder="Zuri afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','afternoon',this)">${escHtml(zuriAfternoon)}</textarea>
-          </div>
+          <div style="font-size:11px;font-weight:700;color:${dogColor};text-transform:uppercase;letter-spacing:0.6px;margin:10px 0 8px;">${dogEmoji}</div>
+          ${isZuri ? zuriSections : paxtonSections}
         </div>
-        <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:10px;">
-          <div style="font-size:11px;font-weight:700;color:var(--paxton);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">🩵 Paxton</div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
-            <input type="text" id="plan-${dk}-paxton-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(paxTreatment)}" oninput="savePlanSlot('${dk}','paxton','treatment',this)">
-            <textarea id="plan-${dk}-paxton-treatment-notes" placeholder="Overall feedback — how he responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','paxton','treatment-notes',this)">${escHtml(paxTreatmentNotes)}</textarea>
-          </div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
-            <textarea id="plan-${dk}-paxton-morning" placeholder="Paxton morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','morning',this)">${escHtml(paxMorning)}</textarea>
-          </div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><div class="plan-slot-dot midday"></div> Midday</div>
-            <textarea id="plan-${dk}-paxton-midday" placeholder="Paxton midday session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','midday',this)">${escHtml(paxMidday)}</textarea>
-          </div>
-          <div class="plan-slot-block">
-            <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
-            <textarea id="plan-${dk}-paxton-afternoon" placeholder="Paxton afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','afternoon',this)">${escHtml(paxAfternoon)}</textarea>
-          </div>
-        </div>
-        ${(loggedZ || loggedP) ? '<div style="margin-top:12px;font-size:12px;color:var(--text-light);font-weight:600;">Session logged' + (loggedZ && loggedP ? ' for both dogs' : loggedZ ? ' for Zuri' : ' for Paxton') + ' \u2713</div>' : ''}
+        ${loggedNote}
       </div>
     `;
     container.appendChild(card);
@@ -876,7 +967,7 @@ function savePlanSlot(dateStr, dog, slot, el) {
 let currentSlot = 'morning';
 
 function updatePlanPeek() {
-  const dk = todayKey();
+  const dk = getLogDate();
   const zuriSlots = ['morning','afternoon','treatment'];
   const paxtonSlots = ['morning','midday','afternoon','treatment'];
   [['zuri', zuriSlots], ['paxton', paxtonSlots]].forEach(([dog, slots]) => {
@@ -910,31 +1001,60 @@ function selectSlot(slot) {
 }
 
 // ─── LOG DRAFT STORAGE ────────────────────────────────────────────
-function draftKey() { return `draft-${currentDog}-${todayKey()}-${currentSlot}`; }
+function draftKey() { return `draft-${currentDog}-${getLogDate()}-${currentSlot}`; }
 
 function autoSave() {
   const draft = {
     training: val('l-training'), topics: [...selectedTopics],
+    topic1: val('l-topic1'), topic2: val('l-topic2'), topic3: val('l-topic3'),
+    topic4: val('l-topic4'), topic5: val('l-topic5'),
     win1: val('l-win1'), win2: val('l-win2'), win3: val('l-win3'),
     ch1: val('l-ch1'), ch2: val('l-ch2'),
-    workon: val('l-workon'), videos: val('l-videos'), dave: val('l-dave'),
+    workon: val('l-workon'),
+    feedbackItems: collectFeedbackItems(),
+    videoItems: collectVideoItems(),
   };
   cloudSet(draftKey(), JSON.stringify(draft));
+}
+
+function collectFeedbackItems() {
+  const items = [];
+  document.querySelectorAll('#feedback-container .feedback-item').forEach(item => {
+    const who = item.querySelector('.feedback-who-input').value.trim();
+    const text = item.querySelector('textarea').value.trim();
+    if (who || text) items.push({ who, text });
+  });
+  return items;
+}
+
+function collectVideoItems() {
+  const items = [];
+  document.querySelectorAll('#videos-container .video-item').forEach(item => {
+    const url = item.querySelector('.video-url-input').value.trim();
+    const desc = item.querySelector('.video-desc-input').value.trim();
+    if (url || desc) items.push({ url, desc });
+  });
+  return items;
 }
 
 function loadTodayDraft() {
   const d = JSON.parse(localStorage.getItem(draftKey()) || '{}');
   setVal('l-training', d.training);
+  setVal('l-topic1', d.topic1); setVal('l-topic2', d.topic2); setVal('l-topic3', d.topic3);
+  setVal('l-topic4', d.topic4); setVal('l-topic5', d.topic5);
   setVal('l-win1', d.win1); setVal('l-win2', d.win2); setVal('l-win3', d.win3);
   setVal('l-ch1', d.ch1); setVal('l-ch2', d.ch2);
-  setVal('l-workon', d.workon); setVal('l-videos', d.videos); setVal('l-dave', d.dave);
+  setVal('l-workon', d.workon);
   loadTopics(d.topics || []);
+  loadFeedbackItems(d.feedbackItems || []);
+  loadVideoItems(d.videoItems || []);
 }
 
 function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
 function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
 
-['l-training','l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon','l-videos','l-dave'].forEach(id => {
+['l-training','l-topic1','l-topic2','l-topic3','l-topic4','l-topic5',
+ 'l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', autoSave);
 });
@@ -1000,31 +1120,42 @@ function loadTopics(topics) {
 function saveEntry() {
   const training = val('l-training').trim();
   if (!training) { showToast('Add some training notes first!'); return; }
+  const sessionTopics = [val('l-topic1'),val('l-topic2'),val('l-topic3'),val('l-topic4'),val('l-topic5')].map(s=>s.trim()).filter(Boolean);
   const entry = {
-    id: Date.now(), dog: currentDog, date: todayKey(),
+    id: Date.now(), dog: currentDog, date: getLogDate(),
     session: currentSlot,
     training,
+    sessionTopics,
     topics: [...selectedTopics],
     wins: [val('l-win1'),val('l-win2'),val('l-win3')].map(s=>s.trim()).filter(Boolean),
     challenges: [val('l-ch1'),val('l-ch2')].map(s=>s.trim()).filter(Boolean),
     workon: val('l-workon').trim(),
-    videos: val('l-videos').trim(),
-    dave: val('l-dave').trim(),
+    feedbackItems: collectFeedbackItems(),
+    videoItems: collectVideoItems(),
+    // legacy fields for backward compat
+    dave: collectFeedbackItems().filter(f=>f.who.toLowerCase().includes('dave')).map(f=>f.text).join('\n') || '',
+    videos: collectVideoItems().map(v=>(v.url ? v.url + ' — ' : '') + v.desc).filter(Boolean).join('\n') || '',
   };
   const entries = getEntries();
-  const idx = entries.findIndex(e => e.dog === currentDog && e.date === entry.date && e.session === currentSlot);
+  const idx = entries.findIndex(e => e.dog === currentDog && e.date === getLogDate() && e.session === currentSlot);
   if (idx >= 0) entries.splice(idx, 1);
   entries.unshift(entry);
   saveEntries(entries);
-  cloudSet(draftKey(), '{}'); // clear draft in cloud too
+  cloudSet(draftKey(), '{}');
   clearForm();
-  showToast(`${currentDog === 'zuri' ? 'Zuri' : 'Paxton'}'s ${currentSlot} session saved! 🐾`);
+  const dk = getLogDate();
+  const isToday = dk === todayKey();
+  const dogName = currentDog === 'zuri' ? 'Zuri' : 'Paxton';
+  showToast(dogName + ' ' + currentSlot + ' saved' + (isToday ? '' : ' for ' + new Date(dk + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})) + '! 🐾');
   renderPlanWeek();
 }
 
 function clearForm() {
-  ['l-training','l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon','l-videos','l-dave'].forEach(id => setVal(id,''));
+  ['l-training','l-topic1','l-topic2','l-topic3','l-topic4','l-topic5',
+   'l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon'].forEach(id => setVal(id,''));
   loadTopics([]);
+  loadFeedbackItems([]);
+  loadVideoItems([]);
   clearScreenshot();
 }
 
@@ -1078,7 +1209,10 @@ function openEntry(id) {
   const chHtml = e.challenges&&e.challenges.length ? `<ul>${e.challenges.map(c=>`<li>${c}</li>`).join('')}</ul>` : '<p style="color:var(--text-light)">None</p>';
   const topicsHtml = e.topics&&e.topics.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${e.topics.map(t=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:var(--parchment);border:1px solid var(--border);color:var(--text-mid);font-weight:600;">${t}</span>`).join('')}</div>` : '';
   document.getElementById('m-body').innerHTML = `
-    <div class="modal-section"><h4 class="${e.dog}">Training Session</h4><p>${e.training}</p></div>
+    <div class="modal-section"><h4 class="${e.dog}">Training Session</h4>
+      ${e.sessionTopics && e.sessionTopics.length ? '<div style="margin-bottom:8px;">' + e.sessionTopics.map((t,i) => '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="width:20px;height:20px;border-radius:50%;background:var(--' + e.dog + ');color:white;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + (i+1) + '</span><span style="font-size:14px;">' + t + '</span></div>').join('') + '</div>' : ''}
+      ${e.training ? '<p style="color:var(--text-light);font-size:13px;">' + e.training + '</p>' : ''}
+    </div>
     ${topicsHtml ? `<div class="divider"></div><div class="modal-section"><h4 class="neutral">🏷️ Topics</h4>${topicsHtml}</div>` : ''}
     <div class="divider"></div>
     <div class="modal-section"><h4 class="${e.dog}">✨ Wins</h4>${winsHtml}</div>
@@ -1092,7 +1226,27 @@ function openEntry(id) {
     <div class="modal-section"><h4 class="neutral">💬 Dave's Feedback</h4>
       <div class="feedback-area"><textarea id="m-dave" style="min-height:70px;">${e.dave||''}</textarea>
       <button class="save-feedback-btn" onclick="saveFeedback(${id})">Save Feedback</button></div>
-    </div>`;
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">💬 Feedback</h4>
+      ${e.feedbackItems && e.feedbackItems.length ? e.feedbackItems.map(f => '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:8px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-bottom:4px;">' + (f.who || 'Feedback') + '</div><p style="font-size:13px;line-height:1.5;">' + (f.text || '') + '</p></div>').join('') : '<p style="color:var(--text-light)">None recorded</p>'}
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">📹 Videos</h4>
+      ${e.videoItems && e.videoItems.length ? e.videoItems.map(v => '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:8px;">' + (v.url ? '<a href="' + v.url + '" target="_blank" style="font-size:12px;color:var(--zuri);font-weight:600;display:block;margin-bottom:4px;word-break:break-all;">' + v.url + '</a>' : '') + '<p style="font-size:13px;">' + (v.desc || '') + '</p></div>').join('') : '<p style="color:var(--text-light)">None recorded</p>'}
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">➕ Add More Feedback</h4>
+      <div id="modal-feedback-add-${id}" style="margin-bottom:8px;">
+        <input type="text" id="modal-who-${id}" placeholder="Who? (Dave, Physio...)" style="min-height:unset;padding:8px 10px;font-size:13px;margin-bottom:6px;">
+        <textarea id="modal-fb-text-${id}" placeholder="Their feedback..." rows="2" style="min-height:52px;font-size:13px;"></textarea>
+        <button onclick="addFeedbackToEntry(${id})" style="margin-top:6px;padding:7px 14px;background:var(--forest);color:white;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Save Feedback</button>
+      </div>
+    </div>
+    `;
   document.getElementById('modal').classList.add('open');
 }
 
@@ -1246,7 +1400,11 @@ async function generateSummary() {
       const dave = daveEntry ? daveEntry.dave : 'none';
       const videos = videosEntry ? videosEntry.videos : 'none';
       const treatment = getPlanSlot(dk, dog, 'treatment');
-      return `${DAYS[i]} (${dk}):\n  Treatment: ${treatment||'none'}\n  Plan:\n${planLines||'    none'}\n  Sessions:\n${sessionLines}\n  Videos to Dave: ${videos}\n  Dave feedback: ${dave}`;
+      const allFeedback = dayEntries.flatMap(x => x.feedbackItems || (x.dave ? [{who:'Dave', text:x.dave}] : []));
+      const allVideos = dayEntries.flatMap(x => x.videoItems || (x.videos ? [{url:'', desc:x.videos}] : []));
+      const feedbackStr = allFeedback.length ? allFeedback.map(f => (f.who||'Someone') + ': ' + f.text).join(' | ') : 'none';
+      const videosStr = allVideos.length ? allVideos.map(v => (v.url||'') + (v.desc ? ' — ' + v.desc : '')).filter(Boolean).join(' | ') : 'none';
+      return `${DAYS[i]} (${dk}):\n  Treatment: ${treatment||'none'}\n  Plan:\n${planLines||'    none'}\n  Sessions:\n${sessionLines}\n  Videos: ${videosStr}\n  Feedback: ${feedbackStr}`;
     }).join('\n\n');
   };
 
@@ -1438,7 +1596,7 @@ function renderRef() {
   });
 
   if (!filtered.length) {
-    list.innerHTML = '<div class="ref-empty"><div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-weight:700;color:var(--text-mid);margin-bottom:6px;">Nothing here yet</div><div>Log sessions with Dave's feedback, videos sent, or treatment notes and they'll appear here for easy reference.</div></div>';
+    list.innerHTML = '<div class="ref-empty"><div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-weight:700;color:var(--text-mid);margin-bottom:6px;">Nothing here yet</div><div>Log sessions with Dave\'s feedback, videos sent, or treatment notes and they\'ll appear here for easy reference.</div></div>';
     return;
   }
 
@@ -1496,6 +1654,171 @@ function renderRef() {
 
   if (!list.innerHTML.trim()) {
     list.innerHTML = '<div class="ref-empty">No matching entries found for this filter.</div>';
+  }
+}
+
+
+
+function addFeedbackToEntry(id) {
+  const who = document.getElementById('modal-who-' + id) ? document.getElementById('modal-who-' + id).value.trim() : '';
+  const text = document.getElementById('modal-fb-text-' + id) ? document.getElementById('modal-fb-text-' + id).value.trim() : '';
+  if (!text) { showToast('Please enter some feedback first'); return; }
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  if (!entries[idx].feedbackItems) entries[idx].feedbackItems = [];
+  entries[idx].feedbackItems.push({ who, text });
+  // update legacy dave field
+  if (who.toLowerCase().includes('dave')) {
+    entries[idx].dave = (entries[idx].dave ? entries[idx].dave + '\n\n' : '') + text;
+  }
+  saveEntries(entries);
+  showToast('Feedback saved! 💬');
+  openEntry(id); // refresh modal
+}
+
+// ─── MULTI FEEDBACK ──────────────────────────────────────────────
+let feedbackCount = 0;
+let videoCount = 0;
+
+function addFeedback(who='', text='', screenshotData=null) {
+  feedbackCount++;
+  const id = 'fb-' + feedbackCount;
+  const container = document.getElementById('feedback-container');
+  const div = document.createElement('div');
+  div.className = 'feedback-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="feedback-item-header">' +
+      '<input class="feedback-who-input" type="text" placeholder="Who? (Dave, Physio, Vet...)" value="' + escHtml(who) + '" oninput="autoSave()">' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<textarea style="min-height:70px;font-size:14px;" placeholder="Their feedback, notes or recommendations..." oninput="autoSave()">' + escHtml(text) + '</textarea>' +
+    '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">' +
+      '<div class="screenshot-drop" style="padding:8px;flex:1;" onclick="triggerFbScreenshot(\'' + id + '\')">' +
+        '<span style="font-size:13px;">📷 Upload screenshot</span>' +
+        '<input type="file" class="fb-ss-input" accept="image/*" style="display:none" onchange="handleFbScreenshot(event,\'' + id + '\')">' +
+      '</div>' +
+    '</div>' +
+    '<div class="fb-ss-preview" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;">' +
+      '<img class="fb-ss-img" style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">' +
+      '<div style="flex:1;">' +
+        '<button onclick="readFbScreenshot(\'' + id + '\')" class="fb-ai-btn" style="padding:5px 10px;background:var(--forest);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✨ Read with AI</button>' +
+        '<button onclick="clearFbScreenshot(\'' + id + '\')" style="margin-left:6px;padding:5px 8px;background:var(--parchment);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Remove</button>' +
+        '<div class="fb-ai-status" style="font-size:11px;color:var(--text-light);display:none;margin-top:3px;">Reading...</div>' +
+      '</div>' +
+    '</div>';
+  container.appendChild(div);
+  if (screenshotData) {
+    // restore screenshot preview if we have data
+  }
+  autoSave();
+}
+
+function loadFeedbackItems(items) {
+  document.getElementById('feedback-container').innerHTML = '';
+  feedbackCount = 0;
+  if (!items || !items.length) {
+    addFeedback('Dave', '');
+    return;
+  }
+  items.forEach(item => addFeedback(item.who || '', item.text || ''));
+}
+
+function triggerFbScreenshot(id) {
+  document.querySelector('#' + id + ' .fb-ss-input').click();
+}
+
+function handleFbScreenshot(event, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const item = document.getElementById(id);
+    const preview = item.querySelector('.fb-ss-preview');
+    const img = item.querySelector('.fb-ss-img');
+    img.src = ev.target.result;
+    img.dataset.b64 = ev.target.result.split(',')[1];
+    preview.style.display = 'flex';
+    item.querySelector('.screenshot-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFbScreenshot(id) {
+  const item = document.getElementById(id);
+  item.querySelector('.fb-ss-input').value = '';
+  item.querySelector('.fb-ss-preview').style.display = 'none';
+  item.querySelector('.screenshot-drop').style.display = 'block';
+}
+
+async function readFbScreenshot(id) {
+  const item = document.getElementById(id);
+  const img = item.querySelector('.fb-ss-img');
+  const b64 = img.dataset.b64;
+  if (!b64) return;
+  const btn = item.querySelector('.fb-ai-btn');
+  const status = item.querySelector('.fb-ai-status');
+  btn.disabled = true; btn.textContent = 'Reading...'; status.style.display = 'block';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+        { type: 'text', text: 'Transcribe all text in this feedback screenshot exactly, then add a line "---" followed by a brief summary of the key points.' }
+      ]}]})
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const ta = item.querySelector('textarea');
+    ta.value = (ta.value ? ta.value + '\n\n' : '') + text;
+    autoSave(); showToast('Screenshot read! 📋');
+  } catch(e) { showToast('Could not read screenshot.'); }
+  finally { btn.disabled = false; btn.textContent = '✨ Read with AI'; status.style.display = 'none'; }
+}
+
+// ─── MULTI VIDEO ─────────────────────────────────────────────────
+function addVideo(url='', desc='') {
+  videoCount++;
+  const id = 'vid-' + videoCount;
+  const container = document.getElementById('videos-container');
+  const div = document.createElement('div');
+  div.className = 'video-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="video-item-header">' +
+      '<span class="video-type-badge">📹 Video</span>' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<input class="video-url-input" type="text" placeholder="YouTube link or video URL (optional)..." value="' + escHtml(url) + '" oninput="autoSave(); tryLoadThumb(\'' + id + '\')">' +
+    '<input class="video-desc-input" type="text" placeholder="What does this video show? e.g. Zuri heelwork clip..." value="' + escHtml(desc) + '" oninput="autoSave()">' +
+    '<img class="video-thumbnail" id="thumb-' + id + '">';
+  container.appendChild(div);
+  if (url) tryLoadThumb(id);
+  autoSave();
+}
+
+function loadVideoItems(items) {
+  document.getElementById('videos-container').innerHTML = '';
+  videoCount = 0;
+  if (!items || !items.length) {
+    addVideo('', '');
+    return;
+  }
+  items.forEach(item => addVideo(item.url || '', item.desc || ''));
+}
+
+function tryLoadThumb(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const url = item.querySelector('.video-url-input').value.trim();
+  const thumb = document.getElementById('thumb-' + id);
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) {
+    thumb.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+    thumb.style.display = 'block';
+  } else {
+    thumb.style.display = 'none';
   }
 }
 
