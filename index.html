@@ -533,6 +533,15 @@ textarea { min-height: 72px; }
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+// ─── ANTHROPIC API ──────────────────────────────────────────────────
+const ANTHROPIC_KEY = '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';
+const ANTHROPIC_HEADERS = {
+  'Content-Type': 'application/json',
+  'x-api-key': ANTHROPIC_KEY,
+  'anthropic-version': '2023-06-01',
+  'anthropic-dangerous-direct-browser-access': 'true'
+};
+
 // ─── SUPABASE SETUP ─────────────────────────────────────────────────
 const SUPA_URL = 'https://pzmkrkolvtsnvqmkecgg.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWtya29sdnRzbnZxbWtlY2dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NDUyNjksImV4cCI6MjA5NzUyMTI2OX0.YcsxFwbCo5ho-w7d-Z1sBKXwwc-fS9wn0rHBF1D8A78';
@@ -584,9 +593,32 @@ async function syncAllFromCloud() {
   if (!supa) return;
   try {
     const { data } = await supa.from('journal_data').select('key, value');
-    if (data && data.length) {
-      data.forEach(row => localStorage.setItem(row.key, row.value));
+    if (!data || !data.length) return; // cloud is empty — don't overwrite local
+    
+    // For entries key, merge cloud and local — keep whichever has more entries
+    const localEntries = JSON.parse(localStorage.getItem('entries') || '[]');
+    const cloudRow = data.find(r => r.key === 'entries');
+    const cloudEntries = cloudRow ? JSON.parse(cloudRow.value || '[]') : [];
+    
+    // Merge: combine both arrays, deduplicate by id, keep most recent
+    const merged = [...localEntries];
+    cloudEntries.forEach(ce => {
+      if (!merged.find(le => le.id === ce.id)) {
+        merged.push(ce);
+      }
+    });
+    if (merged.length > 0) {
+      localStorage.setItem('entries', JSON.stringify(merged));
     }
+    
+    // For all other keys, only overwrite local if local is empty
+    data.forEach(row => {
+      if (row.key === 'entries') return; // already handled above
+      const local = localStorage.getItem(row.key);
+      if (!local || local === '{}' || local === '[]' || local === '') {
+        localStorage.setItem(row.key, row.value);
+      }
+    });
   } catch(e) {}
 }
 
@@ -1443,7 +1475,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
     });
     const data = await res.json();
@@ -1545,7 +1577,7 @@ async function readScreenshot() {
   btn.disabled = true; btn.textContent = 'Reading…'; status.style.display = 'block';
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: screenshotB64 } },
         { type: 'text', text: 'This is a screenshot of feedback from a dog trainer named Dave. Transcribe all text exactly, then write "---" and a concise summary of his key points.' }
@@ -1762,7 +1794,7 @@ async function readFbScreenshot(id) {
   btn.disabled = true; btn.textContent = 'Reading...'; status.style.display = 'block';
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
         { type: 'text', text: 'Transcribe all text in this feedback screenshot exactly, then add a line "---" followed by a brief summary of the key points.' }
