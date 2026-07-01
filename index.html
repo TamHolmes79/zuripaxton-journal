@@ -1510,7 +1510,11 @@ Respond ONLY with a JSON object (no markdown, no backticks):
       headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
     });
-    const data = await res.json();
+    const rawText = await res.text();
+    console.log('Worker response status:', res.status);
+    console.log('Worker response:', rawText.substring(0, 200));
+    const data = JSON.parse(rawText);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = (data.content && data.content[0] && data.content[0].text) || '';
     const s = JSON.parse(text.replace(/```json|```/g,'').trim());
 
@@ -1894,3 +1898,4 @@ init();
 </script>
 </body>
 </html>
+
