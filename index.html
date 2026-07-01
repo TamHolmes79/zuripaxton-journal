@@ -536,10 +536,7 @@ textarea { min-height: 72px; }
 // ─── ANTHROPIC API ──────────────────────────────────────────────────
 const ANTHROPIC_KEY = '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';
 const ANTHROPIC_HEADERS = {
-  'Content-Type': 'application/json',
-  'x-api-key': ANTHROPIC_KEY,
-  'anthropic-version': '2023-06-01',
-  'anthropic-dangerous-direct-browser-access': 'true'
+  'Content-Type': 'application/json'
 };
 
 // ─── SUPABASE SETUP ─────────────────────────────────────────────────
@@ -1508,7 +1505,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
 }`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST',
       headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
@@ -1615,7 +1612,7 @@ async function readScreenshot() {
   const status = document.getElementById('ai-read-status');
   btn.disabled = true; btn.textContent = 'Reading…'; status.style.display = 'block';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST', headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: screenshotB64 } },
@@ -1832,7 +1829,7 @@ async function readFbScreenshot(id) {
   const status = item.querySelector('.fb-ai-status');
   btn.disabled = true; btn.textContent = 'Reading...'; status.style.display = 'block';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST', headers: ANTHROPIC_HEADERS,
       body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
