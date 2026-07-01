@@ -1070,6 +1070,41 @@ function collectVideoItems() {
 }
 
 function loadTodayDraft() {
+  const dk = getLogDate();
+  
+  // First check if there's a saved entry for this date/dog/slot
+  const entries = getEntries();
+  const savedEntry = entries.find(e => e.dog === currentDog && e.date === dk && e.session === currentSlot);
+  
+  if (savedEntry) {
+    // Load from saved entry
+    setVal('l-training', savedEntry.training);
+    const topics = savedEntry.sessionTopics || [];
+    setVal('l-topic1', topics[0] || '');
+    setVal('l-topic2', topics[1] || '');
+    setVal('l-topic3', topics[2] || '');
+    setVal('l-topic4', topics[3] || '');
+    setVal('l-topic5', topics[4] || '');
+    setVal('l-win1', (savedEntry.wins||[])[0] || '');
+    setVal('l-win2', (savedEntry.wins||[])[1] || '');
+    setVal('l-win3', (savedEntry.wins||[])[2] || '');
+    setVal('l-ch1', (savedEntry.challenges||[])[0] || '');
+    setVal('l-ch2', (savedEntry.challenges||[])[1] || '');
+    setVal('l-workon', savedEntry.workon || '');
+    loadTopics(savedEntry.topics || []);
+    loadFeedbackItems(savedEntry.feedbackItems || (savedEntry.dave ? [{who:'Dave', text:savedEntry.dave}] : []));
+    loadVideoItems(savedEntry.videoItems || (savedEntry.videos ? [{url:'', desc:savedEntry.videos}] : []));
+    // Show indicator that this is a saved entry
+    const lbl = document.getElementById('log-date-label');
+    if (lbl) {
+      const isToday = dk === todayKey();
+      lbl.textContent = (isToday ? 'Today' : new Date(dk+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})) + ' — session loaded ✓';
+      lbl.style.color = 'var(--paxton)';
+    }
+    return;
+  }
+  
+  // Otherwise load from draft
   const d = JSON.parse(localStorage.getItem(draftKey()) || '{}');
   setVal('l-training', d.training);
   setVal('l-topic1', d.topic1); setVal('l-topic2', d.topic2); setVal('l-topic3', d.topic3);
@@ -1861,3 +1896,4 @@ init();
 </script>
 </body>
 </html>
+
