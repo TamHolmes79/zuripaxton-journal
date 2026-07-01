@@ -1565,9 +1565,12 @@ function handleScreenshot(e) {
 
 function clearScreenshot() {
   screenshotB64 = null;
-  document.getElementById('ss-input').value = '';
-  document.getElementById('ss-preview').style.display = 'none';
-  document.getElementById('ss-drop').style.display = 'block';
+  const ssInput = document.getElementById('ss-input');
+  const ssPreview = document.getElementById('ss-preview');
+  const ssDrop = document.getElementById('ss-drop');
+  if (ssInput) ssInput.value = '';
+  if (ssPreview) ssPreview.style.display = 'none';
+  if (ssDrop) ssDrop.style.display = 'block';
 }
 
 async function readScreenshot() {
