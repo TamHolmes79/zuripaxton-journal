@@ -1554,7 +1554,8 @@ Respond ONLY with a JSON object (no markdown, no backticks):
       </div>
     `;
   } catch(err) {
-    output.innerHTML = `<div class="summary-card" style="color:#b91c1c;text-align:center;padding:20px;"><p style="font-size:14px;">Couldn't generate summary. Check your connection and try again.</p></div>`;
+    console.error('Summary error:', err);
+    output.innerHTML = `<div class="summary-card" style="color:#b91c1c;text-align:center;padding:20px;"><p style="font-size:14px;">Couldn't generate summary.</p><p style="font-size:12px;margin-top:8px;color:#666;">${err.message || err}</p></div>`;
   }
 }
 
@@ -1896,4 +1897,3 @@ init();
 </script>
 </body>
 </html>
-
