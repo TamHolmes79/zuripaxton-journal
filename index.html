@@ -1475,6 +1475,12 @@ async function generateSummary() {
   const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
   const weightLine = `Zuri: ${weightData.zuri ? weightData.zuri + ' kg' : 'not recorded'}, Paxton: ${weightData.paxton ? weightData.paxton + ' kg' : 'not recorded'}${weightData.notes ? '. Notes: ' + weightData.notes : ''}`;
 
+  // Collect all feedback and videos for the week
+  const allFeedback = weekEntries.flatMap(e => e.feedbackItems || (e.dave ? [{who:'Dave', text:e.dave}] : []));
+  const allVideos = weekEntries.flatMap(e => e.videoItems || (e.videos ? [{url:'', desc:e.videos}] : []));
+  const feedbackStr = allFeedback.length ? allFeedback.map(f => (f.who||'Someone') + ': ' + f.text).join('\n') : 'None recorded';
+  const videosStr = allVideos.length ? allVideos.map(v => (v.desc||'') + (v.url ? ' — ' + v.url : '')).filter(Boolean).join('\n') : 'None recorded';
+
   const prompt = `You are an expert dog training coach reviewing a week of training logs. Produce a thorough, structured weekly summary.
 
 WEEK: ${weekDatesStr(days)}
@@ -1486,19 +1492,26 @@ ${buildDayLines(zuriE, days, 'zuri')}
 === PAXTON (${paxE.length} sessions logged — morning, midday & afternoon) ===
 ${buildDayLines(paxE, days, 'paxton')}
 
+=== ALL FEEDBACK THIS WEEK ===
+${feedbackStr}
+
+=== ALL VIDEOS SENT THIS WEEK ===
+${videosStr}
+
 Respond ONLY with a JSON object (no markdown, no backticks):
 {
   "week_theme": "One overarching theme or headline for this training week",
   "zuri_overall": "2-3 sentences on Zuri's week overall — consistency, energy, progress",
   "zuri_wins": "The standout wins for Zuri this week",
   "zuri_challenges": "Key challenges for Zuri and what they indicate",
-  "zuri_next_week": "2-3 specific things to focus on with Zuri next week",
+  "zuri_top3_actions": ["Action 1 for Zuri next week", "Action 2 for Zuri next week", "Action 3 for Zuri next week"],
   "paxton_overall": "2-3 sentences on Paxton's week overall",
   "paxton_wins": "The standout wins for Paxton this week",
   "paxton_challenges": "Key challenges for Paxton and what they indicate",
-  "paxton_next_week": "2-3 specific things to focus on with Paxton next week",
+  "paxton_top3_actions": ["Action 1 for Paxton next week", "Action 2 for Paxton next week", "Action 3 for Paxton next week"],
   "weight_notes": "Brief comment on their weights this week if recorded — trends, whether on track, anything to watch",
-  "dave_themes": "Summary of Dave's coaching themes from feedback this week (or 'No feedback recorded' if none)",
+  "feedback_summary": "Summary of all feedback received this week — who said what, key themes and coaching points",
+  "dave_themes": "Summary of Dave's specific coaching themes and recommendations from this week (or 'No feedback recorded' if none)",
   "treatment_notes": "Any physio/massage/treatment this week and how it may affect training (omit if none recorded)",
   "sessions_missed": "Any days with no session logged and whether it matters",
   "encouragement": "A warm, specific sentence of encouragement for the trainer based on this week"
@@ -1508,7 +1521,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST',
       headers: ANTHROPIC_HEADERS,
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
     });
     const rawText = await res.text();
     console.log('Worker response status:', res.status);
@@ -1532,7 +1545,9 @@ Respond ONLY with a JSON object (no markdown, no backticks):
         <div class="divider"></div>
         <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.zuri_challenges}</p></div>
         <div class="divider"></div>
-        <div class="summary-section"><h4>🎯 Focus Next Week</h4><p class="summary-text">${s.zuri_next_week}</p></div>
+        <div class="summary-section"><h4>🎯 Top 3 Actions for Next Week</h4>
+          ${(s.zuri_top3_actions||[]).map((a,i) => '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--zuri);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(i+1)+'</div><p class="summary-text" style="margin:0;padding-top:2px;">'+a+'</p></div>').join('')}
+        </div>
       </div>
 
       <div class="summary-card">
@@ -1543,14 +1558,18 @@ Respond ONLY with a JSON object (no markdown, no backticks):
         <div class="divider"></div>
         <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.paxton_challenges}</p></div>
         <div class="divider"></div>
-        <div class="summary-section"><h4>🎯 Focus Next Week</h4><p class="summary-text">${s.paxton_next_week}</p></div>
+        <div class="summary-section"><h4>🎯 Top 3 Actions for Next Week</h4>
+          ${(s.paxton_top3_actions||[]).map((a,i) => '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--paxton);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(i+1)+'</div><p class="summary-text" style="margin:0;padding-top:2px;">'+a+'</p></div>').join('')}
+        </div>
       </div>
 
       <div class="summary-card">
-        ${s.treatment_notes ? `<div class="summary-section"><h4>💆 Treatment & Recovery</h4><p class="summary-text">${s.treatment_notes}</p></div><div class="divider"></div>` : ''}
-        ${s.weight_notes ? `<div class="summary-section"><h4>⚖️ Weight Check-in</h4><p class="summary-text">${s.weight_notes}</p></div><div class="divider"></div>` : ''}
-        ${s.dave_themes && s.dave_themes !== 'No feedback recorded' ? `<div class="summary-section"><h4>💬 Dave's Coaching Themes</h4><p class="summary-text">${s.dave_themes}</p></div><div class="divider"></div>` : ''}
-        ${s.sessions_missed ? `<div class="summary-section"><h4>📅 Sessions Missed</h4><p class="summary-text">${s.sessions_missed}</p></div><div class="divider"></div>` : ''}
+        ${s.feedback_summary ? '<div class="summary-section"><h4>💬 All Feedback This Week</h4><p class="summary-text">'+s.feedback_summary+'</p></div><div class="divider"></div>' : ''}
+        ${s.dave_themes && s.dave_themes !== 'No feedback recorded' ? '<div class="summary-section"><h4>👨‍🏫 Dave\'s Coaching Themes</h4><p class="summary-text">'+s.dave_themes+'</p></div><div class="divider"></div>' : ''}
+        ${allVideos.length ? '<div class="summary-section"><h4>📹 Videos This Week</h4>' + allVideos.map(v => '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:6px;">' + (v.desc ? '<div style="font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:3px;">'+v.desc+'</div>' : '') + (v.url ? '<a href="'+v.url+'" target="_blank" style="font-size:12px;color:var(--zuri);word-break:break-all;">'+v.url+'</a>' : '') + '</div>').join('') + '</div><div class="divider"></div>' : ''}
+        ${s.treatment_notes ? '<div class="summary-section"><h4>💆 Treatment & Recovery</h4><p class="summary-text">'+s.treatment_notes+'</p></div><div class="divider"></div>' : ''}
+        ${s.weight_notes ? '<div class="summary-section"><h4>⚖️ Weight Check-in</h4><p class="summary-text">'+s.weight_notes+'</p></div><div class="divider"></div>' : ''}
+        ${s.sessions_missed ? '<div class="summary-section"><h4>📅 Sessions Missed</h4><p class="summary-text">'+s.sessions_missed+'</p></div><div class="divider"></div>' : ''}
         <div class="summary-section"><p class="summary-text" style="font-style:italic;color:var(--zuri);">${s.encouragement}</p></div>
       </div>
     `;
@@ -1898,4 +1917,3 @@ init();
 </script>
 </body>
 </html>
-
