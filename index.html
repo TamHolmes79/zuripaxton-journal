@@ -636,6 +636,8 @@ function getLogDate() {
 
 function onLogDateChange() {
   const dk = getLogDate();
+  // Persist the date selection
+  localStorage.setItem('log-date-picker-value', dk);
   const d = new Date(dk + 'T12:00:00');
   const isToday = dk === todayKey();
   const label = document.getElementById('log-date-label');
@@ -792,7 +794,17 @@ function showScreen(name) {
   if (name === 'ref') renderRef();
   if (name === 'plan') renderPlanWeek();
   if (name === 'history') renderHistory();
-  if (name === 'log') updatePlanPeek();
+  if (name === 'log') {
+    // Restore saved date picker value
+    const savedDate = localStorage.getItem('log-date-picker-value');
+    const picker = document.getElementById('log-date-picker');
+    if (picker && savedDate) {
+      picker.value = savedDate;
+      onLogDateChange();
+    } else {
+      updatePlanPeek();
+    }
+  }
   if (name === 'summary') renderSummaryWeekNav();
 }
 
@@ -1192,7 +1204,15 @@ function loadTopics(topics) {
 // ─── SAVE ENTRY ───────────────────────────────────────────────────
 function saveEntry() {
   const training = val('l-training').trim();
-  if (!training) { showToast('Add some training notes first!'); return; }
+  const topics = [val('l-topic1'),val('l-topic2'),val('l-topic3'),val('l-topic4'),val('l-topic5')].map(s=>s.trim()).filter(Boolean);
+  const feedback = collectFeedbackItems();
+  const videos = collectVideoItems();
+  
+  // Require at least SOMETHING to be filled in
+  if (!training && !topics.length && !feedback.some(f=>f.text) && !videos.some(v=>v.url||v.desc)) {
+    showToast('Please add some session details first!');
+    return;
+  }
   const sessionTopics = [val('l-topic1'),val('l-topic2'),val('l-topic3'),val('l-topic4'),val('l-topic5')].map(s=>s.trim()).filter(Boolean);
   const entry = {
     id: Date.now(), dog: currentDog, date: getLogDate(),
