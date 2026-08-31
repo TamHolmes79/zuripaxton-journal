@@ -233,6 +233,21 @@ textarea { min-height: 72px; }
 .ref-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; color: var(--text-light); }
 .ref-text { font-size: 13px; line-height: 1.5; color: var(--text-dark); white-space: pre-wrap; }
 .ref-empty { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 13px; }
+
+/* COMP LOG */
+.comp-card { background: var(--warm-white); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 1px 4px var(--shadow); }
+.comp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.comp-result-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.comp-result-badge.qualified { background: #e8f5e9; color: #2e7d32; }
+.comp-result-badge.placed { background: var(--zuri-light); color: var(--zuri); }
+.comp-result-badge.eliminated { background: var(--red-light); color: var(--red); }
+.comp-result-badge.competed { background: var(--parchment); color: var(--text-mid); }
+.comp-field-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin-bottom: 5px; margin-top: 12px; }
+.comp-entry-card { background: var(--warm-white); border-radius: 14px; padding: 16px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 4px solid var(--zuri); cursor: pointer; }
+.comp-entry-date { font-family: Fraunces, serif; font-size: 16px; font-weight: 700; color: var(--text-dark); }
+.comp-entry-location { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+.comp-entry-class { font-size: 12px; font-weight: 600; color: var(--zuri); margin-top: 4px; }
+
 .treatment-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; margin-right: 4px; }
 /* MULTI FEEDBACK & VIDEO */
 .feedback-item { background: var(--parchment); border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; border: 1px solid var(--border); }
@@ -279,6 +294,46 @@ textarea { min-height: 72px; }
     <button class="filter-chip" onclick="filterRef('videos',this)">📹 Videos</button>
   </div>
   <div id="ref-list"></div>
+</div>
+
+<!-- ===== COMP SCREEN ===== -->
+<div class="screen" id="screen-comp">
+  <div class="screen-heading">🏆 Zuri's Competition Log</div>
+  <div class="screen-sub">Record and review all competition results</div>
+
+  <!-- Add new comp button -->
+  <button onclick="showCompForm()" id="add-comp-btn" style="width:100%;padding:14px;border:none;border-radius:12px;background:var(--zuri);color:white;font-family:Fraunces,serif;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:16px;">+ Log New Competition</button>
+
+  <!-- New comp form -->
+  <div id="comp-form" style="display:none;" class="comp-card">
+    <div style="font-family:Fraunces,serif;font-size:17px;font-weight:700;color:var(--zuri);margin-bottom:14px;">🏆 New Competition</div>
+
+    <div class="comp-field-label">📅 Date</div>
+    <input type="date" id="comp-date" style="width:100%;padding:10px 12px;font-size:14px;border:1.5px solid var(--border);border-radius:10px;font-family:Inter,sans-serif;color:var(--text-dark);background:var(--cream);">
+
+    <div class="comp-field-label">📍 Location / Show Name</div>
+    <input type="text" id="comp-location" placeholder="e.g. Royal Canin Show, Sydney" style="min-height:unset;padding:10px 12px;font-size:14px;">
+
+    <div class="comp-field-label">📝 Overall Day Notes</div>
+    <textarea id="comp-notes" placeholder="How did the day go overall? How was Zuri feeling, conditions, anything notable..." rows="2" style="min-height:60px;"></textarea>
+
+    <div class="comp-field-label">🎯 Overall Work On</div>
+    <textarea id="comp-workon" placeholder="Based on today, what to focus on before the next comp..." rows="2" style="min-height:60px;"></textarea>
+
+    <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--zuri);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">📋 Runs — Add up to 6</div>
+      <div id="comp-runs-container"></div>
+      <button class="add-item-btn" id="add-run-btn" onclick="addCompRun()" style="border-color:var(--zuri);color:var(--zuri);">+ Add Run</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="saveComp()" style="flex:1;padding:14px;border:none;border-radius:12px;background:var(--zuri);color:white;font-family:Fraunces,serif;font-size:16px;font-weight:700;cursor:pointer;">Save Competition</button>
+      <button onclick="hideCompForm()" style="padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;background:var(--parchment);color:var(--text-mid);font-family:Inter,sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Competition list -->
+  <div id="comp-list"></div>
 </div>
 
 <!-- ===== PLAN SCREEN ===== -->
@@ -501,6 +556,8 @@ textarea { min-height: 72px; }
       📋 Copy to Share
     </button>
   </div>
+
+  <div id="paxton-letter-output" style="margin-bottom:12px;"></div>
   <div id="summary-output"></div>
 </div>
 
@@ -521,6 +578,10 @@ textarea { min-height: 72px; }
   <button class="nav-btn" id="nav-ref" onclick="showScreen('ref')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     Reference
+  </button>
+  <button class="nav-btn" id="nav-comp" onclick="showScreen('comp')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    Comp
   </button>
   <button class="nav-btn active" id="nav-plan" onclick="showScreen('plan')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="8" y1="18" x2="14" y2="18"/></svg>
@@ -792,6 +853,7 @@ function showScreen(name) {
   document.getElementById('screen-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
   if (name === 'ref') renderRef();
+  if (name === 'comp') renderCompLog();
   if (name === 'plan') renderPlanWeek();
   if (name === 'history') renderHistory();
   if (name === 'log') {
@@ -881,6 +943,1998 @@ function renderPlanWeek() {
     const dk = dateKey(date);
     const isToday = dk === today;
     const dayName = DAYS[i];
+    const dateStr = date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+    const zuriMorning = getPlanSlot(dk, 'zuri', 'morning');
+    const zuriAfternoon = getPlanSlot(dk, 'zuri', 'afternoon');
+    const zuriTreatment = getPlanSlot(dk, 'zuri', 'treatment');
+    const zuriTreatmentNotes = getPlanSlot(dk, 'zuri', 'treatment-notes');
+    const paxMorning = getPlanSlot(dk, 'paxton', 'morning');
+    const paxMidday = getPlanSlot(dk, 'paxton', 'midday');
+    const paxAfternoon = getPlanSlot(dk, 'paxton', 'afternoon');
+    const paxTreatment = getPlanSlot(dk, 'paxton', 'treatment');
+    const paxTreatmentNotes = getPlanSlot(dk, 'paxton', 'treatment-notes');
+    const zuriPlan = zuriMorning || zuriAfternoon;
+    const paxPlan = paxMorning || paxMidday || paxAfternoon;
+    const loggedZ = hasLog(dk, 'zuri');
+    const loggedP = hasLog(dk, 'paxton');
+
+    // Build status badges
+    let badges = '';
+    const zStatus = loggedZ ? 'logged' : (zuriPlan ? 'has-plan zuri' : 'planned');
+    const zLabel = loggedZ ? '✓ Zuri' : (zuriPlan ? '🟣 Zuri' : '—');
+    const pStatus = loggedP ? 'logged' : (paxPlan ? 'has-plan paxton' : 'planned');
+    const pLabel = loggedP ? '✓ Paxton' : (paxPlan ? '🩵 Paxton' : '—');
+    badges = `<div class="day-badge">
+      <div class="day-status ${zStatus}">${zLabel}</div>
+      <div class="day-status ${pStatus}">${pLabel}</div>
+    </div>`;
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    const bodyOpen = isToday ? ' open' : '';
+    const headerClass = isToday ? 'day-card-header today-day open-header' : 'day-card-header';
+    const chevron = isToday ? '▲' : '▼';
+
+    // Only show the selected dog's badge and sections
+    const isZuri = currentDog === 'zuri';
+    const dogColor = isZuri ? 'var(--zuri)' : 'var(--paxton)';
+    const dogEmoji = isZuri ? '🟣 Zuri' : '🩵 Paxton';
+    const dogStatus = isZuri
+      ? (loggedZ ? 'logged' : (zuriPlan ? 'has-plan zuri' : 'planned'))
+      : (loggedP ? 'logged' : (paxPlan ? 'has-plan paxton' : 'planned'));
+    const dogLabel = isZuri
+      ? (loggedZ ? '✓ Zuri' : (zuriPlan ? '🟣 Zuri' : '🟣 Zuri'))
+      : (loggedP ? '✓ Paxton' : (paxPlan ? '🩵 Paxton' : '🩵 Paxton'));
+
+    badges = `<div class="day-badge"><div class="day-status ${dogStatus}">${dogLabel}</div></div>`;
+
+    const zuriSections = `
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+          <input type="text" id="plan-${dk}-zuri-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(zuriTreatment)}" oninput="savePlanSlot('${dk}','zuri','treatment',this)">
+          <textarea id="plan-${dk}-zuri-treatment-notes" placeholder="Overall feedback — how she responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','zuri','treatment-notes',this)">${escHtml(zuriTreatmentNotes)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+          <textarea id="plan-${dk}-zuri-morning" placeholder="Zuri morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','morning',this)">${escHtml(zuriMorning)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+          <textarea id="plan-${dk}-zuri-afternoon" placeholder="Zuri afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','zuri','afternoon',this)">${escHtml(zuriAfternoon)}</textarea>
+        </div>`;
+
+    const paxtonSections = `
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><span>💆</span> Treatment / Physio today</div>
+          <input type="text" id="plan-${dk}-paxton-treatment" placeholder="e.g. physio, massage, hydrotherapy, rest day..." style="min-height:unset;padding:9px 12px;font-size:13px;" value="${escHtml(paxTreatment)}" oninput="savePlanSlot('${dk}','paxton','treatment',this)">
+          <textarea id="plan-${dk}-paxton-treatment-notes" placeholder="Overall feedback — how he responded, therapist comments, anything to carry forward..." rows="2" style="min-height:56px;margin-top:8px;" oninput="savePlanSlot('${dk}','paxton','treatment-notes',this)">${escHtml(paxTreatmentNotes)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot morning"></div> Morning</div>
+          <textarea id="plan-${dk}-paxton-morning" placeholder="Paxton morning session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','morning',this)">${escHtml(paxMorning)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot midday"></div> Midday</div>
+          <textarea id="plan-${dk}-paxton-midday" placeholder="Paxton midday session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','midday',this)">${escHtml(paxMidday)}</textarea>
+        </div>
+        <div class="plan-slot-block">
+          <div class="plan-slot-header"><div class="plan-slot-dot afternoon"></div> Afternoon</div>
+          <textarea id="plan-${dk}-paxton-afternoon" placeholder="Paxton afternoon session..." rows="2" style="min-height:52px;" oninput="savePlanSlot('${dk}','paxton','afternoon',this)">${escHtml(paxAfternoon)}</textarea>
+        </div>`;
+
+    const loggedNote = (loggedZ || loggedP) ? '<div style="margin-top:12px;font-size:12px;color:var(--text-light);font-weight:600;">Session logged ✓</div>' : '';
+
+    card.innerHTML = `
+      <div class="${headerClass}" onclick="toggleDayCard('day-body-${i}', this)">
+        <div>
+          <div class="day-name">${dayName}${isToday ? ' <span style="font-size:11px;color:' + dogColor + ';font-weight:600;">Today</span>' : ''}</div>
+          <div class="day-date-tag">${dateStr}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${badges}
+          <span class="day-card-chevron">${chevron}</span>
+        </div>
+      </div>
+      <div class="day-card-body${bodyOpen}" id="day-body-${i}">
+        <div style="margin-top:4px;">
+          <div style="font-size:11px;font-weight:700;color:${dogColor};text-transform:uppercase;letter-spacing:0.6px;margin:10px 0 8px;">${dogEmoji}</div>
+          ${isZuri ? zuriSections : paxtonSections}
+        </div>
+        ${loggedNote}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleDayCard(id, header) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+  const isOpen = el.classList.contains('open');
+  if (header) {
+    header.classList.toggle('open-header', isOpen);
+    const chevron = header.querySelector('.day-card-chevron');
+    if (chevron) chevron.textContent = isOpen ? '▲' : '▼';
+  }
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── PLAN STORAGE (slot-based) ────────────────────────────────────
+function planSlotKey(dateStr, dog, slot) { return 'plan-' + dateStr + '-' + dog + '-' + slot; }
+function getPlanSlot(dateStr, dog, slot) { return localStorage.getItem(planSlotKey(dateStr, dog, slot)) || ''; }
+// Legacy single-key getter (for backward compat)
+function getPlanForDay(dateStr, dog) {
+  return getPlanSlot(dateStr,dog,'morning') || getPlanSlot(dateStr,dog,'afternoon') || getPlanSlot(dateStr,dog,'midday') || '';
+}
+function savePlanSlot(dateStr, dog, slot, el) {
+  const element = el || document.getElementById('plan-' + dateStr + '-' + dog + '-' + slot);
+  if (element) { cloudSet(planSlotKey(dateStr, dog, slot), element.value); }
+  updatePlanPeek();
+}
+
+// ─── PLAN PEEK in Today ───────────────────────────────────────────
+let currentSlot = 'morning';
+
+function updatePlanPeek() {
+  const dk = getLogDate();
+  const zuriSlots = ['morning','afternoon','treatment'];
+  const paxtonSlots = ['morning','midday','afternoon','treatment'];
+  [['zuri', zuriSlots], ['paxton', paxtonSlots]].forEach(([dog, slots]) => {
+    slots.forEach(slot => {
+      const el = document.getElementById(`peek-${dog}-${slot}`);
+      const wrapEl = document.getElementById(`peek-slot-${dog}-treatment`);
+      const v = getPlanSlot(dk, dog, slot);
+      if (el) {
+        el.textContent = v || (slot === 'treatment' ? '' : 'Not planned');
+        el.className = 'plan-peek-slot-text' + (v ? '' : ' empty');
+      }
+      if (slot === 'treatment' && wrapEl) {
+        wrapEl.style.display = v ? 'block' : 'none';
+      }
+    });
+  });
+}
+
+function selectSlot(slot) {
+  currentSlot = slot;
+  const dog = currentDog;
+  // Update tab active states
+  const tabIds = dog === 'zuri'
+    ? { morning: 'slot-morning', afternoon: 'slot-afternoon' }
+    : { morning: 'slot-morning-p', midday: 'slot-midday-p', afternoon: 'slot-afternoon-p' };
+  Object.entries(tabIds).forEach(([s, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.className = `slot-tab${s === slot ? ' active' : ''} ${dog}`;
+  });
+  loadTodayDraft();
+}
+
+// ─── LOG DRAFT STORAGE ────────────────────────────────────────────
+function draftKey() { return `draft-${currentDog}-${getLogDate()}-${currentSlot}`; }
+
+function autoSave() {
+  const draft = {
+    training: val('l-training'), topics: [...selectedTopics],
+    topic1: val('l-topic1'), topic2: val('l-topic2'), topic3: val('l-topic3'),
+    topic4: val('l-topic4'), topic5: val('l-topic5'),
+    win1: val('l-win1'), win2: val('l-win2'), win3: val('l-win3'),
+    ch1: val('l-ch1'), ch2: val('l-ch2'),
+    workon: val('l-workon'),
+    feedbackItems: collectFeedbackItems(),
+    videoItems: collectVideoItems(),
+  };
+  cloudSet(draftKey(), JSON.stringify(draft));
+}
+
+function collectFeedbackItems() {
+  const items = [];
+  document.querySelectorAll('#feedback-container .feedback-item').forEach(item => {
+    const who = item.querySelector('.feedback-who-input').value.trim();
+    const text = item.querySelector('textarea').value.trim();
+    if (who || text) items.push({ who, text });
+  });
+  return items;
+}
+
+function collectVideoItems() {
+  const items = [];
+  document.querySelectorAll('#videos-container .video-item').forEach(item => {
+    const url = item.querySelector('.video-url-input').value.trim();
+    const desc = item.querySelector('.video-desc-input').value.trim();
+    if (url || desc) items.push({ url, desc });
+  });
+  return items;
+}
+
+function loadTodayDraft() {
+  const dk = getLogDate();
+  
+  // First check if there's a saved entry for this date/dog/slot
+  const entries = getEntries();
+  const savedEntry = entries.find(e => e.dog === currentDog && e.date === dk && e.session === currentSlot);
+  
+  if (savedEntry) {
+    // Load from saved entry
+    setVal('l-training', savedEntry.training);
+    const topics = savedEntry.sessionTopics || [];
+    setVal('l-topic1', topics[0] || '');
+    setVal('l-topic2', topics[1] || '');
+    setVal('l-topic3', topics[2] || '');
+    setVal('l-topic4', topics[3] || '');
+    setVal('l-topic5', topics[4] || '');
+    setVal('l-win1', (savedEntry.wins||[])[0] || '');
+    setVal('l-win2', (savedEntry.wins||[])[1] || '');
+    setVal('l-win3', (savedEntry.wins||[])[2] || '');
+    setVal('l-ch1', (savedEntry.challenges||[])[0] || '');
+    setVal('l-ch2', (savedEntry.challenges||[])[1] || '');
+    setVal('l-workon', savedEntry.workon || '');
+    loadTopics(savedEntry.topics || []);
+    loadFeedbackItems(savedEntry.feedbackItems || (savedEntry.dave ? [{who:'Dave', text:savedEntry.dave}] : []));
+    loadVideoItems(savedEntry.videoItems || (savedEntry.videos ? [{url:'', desc:savedEntry.videos}] : []));
+    // Show indicator that this is a saved entry
+    const lbl = document.getElementById('log-date-label');
+    if (lbl) {
+      const isToday = dk === todayKey();
+      lbl.textContent = (isToday ? 'Today' : new Date(dk+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})) + ' — session loaded ✓';
+      lbl.style.color = 'var(--paxton)';
+    }
+    return;
+  }
+  
+  // Otherwise load from draft
+  const d = JSON.parse(localStorage.getItem(draftKey()) || '{}');
+  setVal('l-training', d.training);
+  setVal('l-topic1', d.topic1); setVal('l-topic2', d.topic2); setVal('l-topic3', d.topic3);
+  setVal('l-topic4', d.topic4); setVal('l-topic5', d.topic5);
+  setVal('l-win1', d.win1); setVal('l-win2', d.win2); setVal('l-win3', d.win3);
+  setVal('l-ch1', d.ch1); setVal('l-ch2', d.ch2);
+  setVal('l-workon', d.workon);
+  loadTopics(d.topics || []);
+  loadFeedbackItems(d.feedbackItems || []);
+  loadVideoItems(d.videoItems || []);
+}
+
+function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+
+['l-training','l-topic1','l-topic2','l-topic3','l-topic4','l-topic5',
+ 'l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', autoSave);
+});
+
+// ─── TOPICS ───────────────────────────────────────────────────────
+function toggleChip(btn, name) {
+  btn.dataset.topic = name;
+  const cls = 'on-' + currentDog;
+  if (btn.classList.contains(cls)) {
+    btn.classList.remove(cls);
+    selectedTopics = selectedTopics.filter(t => t !== name);
+  } else {
+    btn.classList.add(cls);
+    if (!selectedTopics.includes(name)) selectedTopics.push(name);
+  }
+  autoSave();
+}
+
+function addTopic() {
+  const input = document.getElementById('custom-topic');
+  const name = input.value.trim();
+  if (!name || selectedTopics.includes(name)) { input.value = ''; return; }
+  const chips = document.getElementById('topic-chips');
+  const btn = document.createElement('button');
+  btn.className = 'chip on-' + currentDog;
+  btn.dataset.topic = name;
+  btn.textContent = name + ' ✕';
+  btn.onclick = () => { selectedTopics = selectedTopics.filter(t => t !== name); btn.remove(); autoSave(); };
+  chips.appendChild(btn);
+  selectedTopics.push(name);
+  input.value = '';
+  autoSave();
+}
+
+function loadTopics(topics) {
+  selectedTopics = [];
+  document.querySelectorAll('#topic-chips .chip').forEach(btn => btn.classList.remove('on-zuri','on-paxton'));
+  document.querySelectorAll('#topic-chips .chip[data-custom]').forEach(btn => btn.remove());
+  topics.forEach(name => {
+    let found = false;
+    document.querySelectorAll('#topic-chips .chip').forEach(btn => {
+      if (btn.dataset.topic === name || btn.textContent.trim() === name) {
+        btn.dataset.topic = name;
+        btn.classList.add('on-' + currentDog);
+        found = true;
+      }
+    });
+    if (!found) {
+      const chips = document.getElementById('topic-chips');
+      const btn = document.createElement('button');
+      btn.className = 'chip on-' + currentDog;
+      btn.dataset.topic = name;
+      btn.setAttribute('data-custom','1');
+      btn.textContent = name + ' ✕';
+      btn.onclick = () => { selectedTopics = selectedTopics.filter(t => t !== name); btn.remove(); autoSave(); };
+      chips.appendChild(btn);
+    }
+    selectedTopics.push(name);
+  });
+}
+
+// ─── SAVE ENTRY ───────────────────────────────────────────────────
+function saveEntry() {
+  const training = val('l-training').trim();
+  const topics = [val('l-topic1'),val('l-topic2'),val('l-topic3'),val('l-topic4'),val('l-topic5')].map(s=>s.trim()).filter(Boolean);
+  const feedback = collectFeedbackItems();
+  const videos = collectVideoItems();
+  
+  // Require at least SOMETHING to be filled in
+  if (!training && !topics.length && !feedback.some(f=>f.text) && !videos.some(v=>v.url||v.desc)) {
+    showToast('Please add some session details first!');
+    return;
+  }
+  const sessionTopics = [val('l-topic1'),val('l-topic2'),val('l-topic3'),val('l-topic4'),val('l-topic5')].map(s=>s.trim()).filter(Boolean);
+  const entry = {
+    id: Date.now(), dog: currentDog, date: getLogDate(),
+    session: currentSlot,
+    training,
+    sessionTopics,
+    topics: [...selectedTopics],
+    wins: [val('l-win1'),val('l-win2'),val('l-win3')].map(s=>s.trim()).filter(Boolean),
+    challenges: [val('l-ch1'),val('l-ch2')].map(s=>s.trim()).filter(Boolean),
+    workon: val('l-workon').trim(),
+    feedbackItems: collectFeedbackItems(),
+    videoItems: collectVideoItems(),
+    // legacy fields for backward compat
+    dave: collectFeedbackItems().filter(f=>f.who.toLowerCase().includes('dave')).map(f=>f.text).join('\n') || '',
+    videos: collectVideoItems().map(v=>(v.url ? v.url + ' — ' : '') + v.desc).filter(Boolean).join('\n') || '',
+  };
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.dog === currentDog && e.date === getLogDate() && e.session === currentSlot);
+  if (idx >= 0) entries.splice(idx, 1);
+  entries.unshift(entry);
+  saveEntries(entries);
+  cloudSet(draftKey(), '{}');
+  clearForm();
+  const dk = getLogDate();
+  const isToday = dk === todayKey();
+  const dogName = currentDog === 'zuri' ? 'Zuri' : 'Paxton';
+  showToast(dogName + ' ' + currentSlot + ' saved' + (isToday ? '' : ' for ' + new Date(dk + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})) + '! 🐾');
+  renderPlanWeek();
+}
+
+function clearForm() {
+  ['l-training','l-topic1','l-topic2','l-topic3','l-topic4','l-topic5',
+   'l-win1','l-win2','l-win3','l-ch1','l-ch2','l-workon'].forEach(id => setVal(id,''));
+  loadTopics([]);
+  loadFeedbackItems([]);
+  loadVideoItems([]);
+  clearScreenshot();
+}
+
+function getEntries() { return JSON.parse(localStorage.getItem('entries') || '[]'); }
+function saveEntries(e) { cloudSet('entries', JSON.stringify(e)); }
+function hasLog(dateStr, dog) { return getEntries().some(e => e.date === dateStr && e.dog === dog); }
+
+// ─── HISTORY ──────────────────────────────────────────────────────
+function filterHistory(filter, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.className = 'filter-chip');
+  btn.classList.add('on-' + filter);
+  renderHistory(filter);
+}
+
+function renderHistory(filter = 'all') {
+  const list = document.getElementById('history-list');
+  const entries = getEntries();
+  const filtered = filter === 'all' ? entries : entries.filter(e => e.dog === filter);
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions yet</h3><p>Log your first training session to see it here.</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const dStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+    const slotLabel = e.session ? ` ${slotIcon} ${e.session.charAt(0).toUpperCase() + e.session.slice(1)}` : '';
+    const pills = e.wins.slice(0,2).map(w=>`<div class="pill">${w.substring(0,28)}${w.length>28?'…':''}</div>`).join('');
+    return `<div class="entry-card" onclick="openEntry(${e.id})">
+      <div class="entry-header">
+        <div class="entry-date">${dStr}<span style="font-size:11px;font-weight:600;color:var(--text-light);margin-left:6px;">${slotLabel}</span></div>
+        <div class="dog-badge ${e.dog}">${e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton'}</div>
+      </div>
+      <div class="entry-preview">${e.training}</div>
+      ${pills ? `<div class="pill-row">${pills}</div>` : ''}
+      ${e.dave ? '<div style="margin-top:5px;font-size:11px;color:var(--paxton);font-weight:600;">💬 Dave\'s feedback</div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function openEntry(id) {
+  const e = getEntries().find(x => x.id === id);
+  if (!e) return;
+  const d = new Date(e.date+'T12:00:00');
+  const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+  const slotStr = e.session ? ` — ${slotIcon} ${e.session.charAt(0).toUpperCase() + e.session.slice(1)}` : '';
+  document.getElementById('m-badge').textContent = e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton';
+  document.getElementById('m-badge').className = 'dog-badge ' + e.dog;
+  document.getElementById('m-title').textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + slotStr;
+  const winsHtml = e.wins.length ? `<ul>${e.wins.map(w=>`<li>${w}</li>`).join('')}</ul>` : '<p style="color:var(--text-light)">None</p>';
+  const chHtml = e.challenges&&e.challenges.length ? `<ul>${e.challenges.map(c=>`<li>${c}</li>`).join('')}</ul>` : '<p style="color:var(--text-light)">None</p>';
+  const topicsHtml = e.topics&&e.topics.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${e.topics.map(t=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:var(--parchment);border:1px solid var(--border);color:var(--text-mid);font-weight:600;">${t}</span>`).join('')}</div>` : '';
+  document.getElementById('m-body').innerHTML = `
+    <div class="modal-section"><h4 class="${e.dog}">Training Session</h4>
+      ${e.sessionTopics && e.sessionTopics.length ? '<div style="margin-bottom:8px;">' + e.sessionTopics.map((t,i) => '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="width:20px;height:20px;border-radius:50%;background:var(--' + e.dog + ');color:white;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + (i+1) + '</span><span style="font-size:14px;">' + t + '</span></div>').join('') + '</div>' : ''}
+      ${e.training ? '<p style="color:var(--text-light);font-size:13px;">' + e.training + '</p>' : ''}
+    </div>
+    ${topicsHtml ? `<div class="divider"></div><div class="modal-section"><h4 class="neutral">🏷️ Topics</h4>${topicsHtml}</div>` : ''}
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="${e.dog}">✨ Wins</h4>${winsHtml}</div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">⚠️ Challenges</h4>${chHtml}</div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">🎯 Work On Next</h4><p>${e.workon||'<span style="color:var(--text-light)">Not recorded</span>'}</p></div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">📹 Videos to Dave</h4><p>${e.videos||'<span style="color:var(--text-light)">None</span>'}</p></div>
+    <div class="divider"></div>
+    <div class="modal-section"><h4 class="neutral">💬 Dave's Feedback</h4>
+      <div class="feedback-area"><textarea id="m-dave" style="min-height:70px;">${e.dave||''}</textarea>
+      <button class="save-feedback-btn" onclick="saveFeedback(${id})">Save Feedback</button></div>
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">💬 Feedback</h4>
+      ${e.feedbackItems && e.feedbackItems.length ? e.feedbackItems.map(f => '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:8px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-bottom:4px;">' + (f.who || 'Feedback') + '</div><p style="font-size:13px;line-height:1.5;">' + (f.text || '') + '</p></div>').join('') : '<p style="color:var(--text-light)">None recorded</p>'}
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">📹 Videos</h4>
+      ${e.videoItems && e.videoItems.length ? e.videoItems.map(v => '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:8px;">' + (v.url ? '<a href="' + v.url + '" target="_blank" style="font-size:12px;color:var(--zuri);font-weight:600;display:block;margin-bottom:4px;word-break:break-all;">' + v.url + '</a>' : '') + '<p style="font-size:13px;">' + (v.desc || '') + '</p></div>').join('') : '<p style="color:var(--text-light)">None recorded</p>'}
+    </div>
+    <div class="divider"></div>
+    <div class="modal-section">
+      <h4 class="neutral">➕ Add More Feedback</h4>
+      <div id="modal-feedback-add-${id}" style="margin-bottom:8px;">
+        <input type="text" id="modal-who-${id}" placeholder="Who? (Dave, Physio...)" style="min-height:unset;padding:8px 10px;font-size:13px;margin-bottom:6px;">
+        <textarea id="modal-fb-text-${id}" placeholder="Their feedback..." rows="2" style="min-height:52px;font-size:13px;"></textarea>
+        <button onclick="addFeedbackToEntry(${id})" style="margin-top:6px;padding:7px 14px;background:var(--forest);color:white;border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Save Feedback</button>
+      </div>
+    </div>
+    `;
+  document.getElementById('modal').classList.add('open');
+}
+
+function saveFeedback(id) {
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  entries[idx].dave = document.getElementById('m-dave').value;
+  saveEntries(entries); // already goes to cloud via saveEntries
+  showToast('Feedback saved!');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); renderHistory(); }
+
+// ─── SUMMARY ──────────────────────────────────────────────────────
+function renderSummaryWeekNav() {
+  const days = getWeekDates(sumWeekOffset);
+  document.getElementById('sum-week-label').textContent = weekLabel(sumWeekOffset);
+  document.getElementById('sum-week-dates').textContent = weekDatesStr(days);
+  document.getElementById('weight-week-tag').textContent = weekDatesStr(days);
+  loadWeights();
+}
+
+// ─── WEIGHT TRACKING ──────────────────────────────────────────────
+function weightKey() {
+  const days = getWeekDates(sumWeekOffset);
+  return 'weight-' + dateKey(days[0]);
+}
+
+function saveWeights() {
+  const data = {
+    zuri: document.getElementById('w-zuri').value,
+    paxton: document.getElementById('w-paxton').value,
+    notes: document.getElementById('w-notes').value,
+  };
+  cloudSet(weightKey(), JSON.stringify(data));
+  showWeightDiff();
+}
+
+function loadWeights() {
+  const data = JSON.parse(localStorage.getItem(weightKey()) || '{}');
+  document.getElementById('w-zuri').value = data.zuri || '';
+  document.getElementById('w-paxton').value = data.paxton || '';
+  document.getElementById('w-notes').value = data.notes || '';
+  showWeightDiff();
+  // Hide history when switching weeks
+  document.getElementById('w-history').style.display = 'none';
+  document.getElementById('w-hist-btn').textContent = '📊 Show weight history ▸';
+}
+
+function showWeightDiff() {
+  // Compare to previous week
+  const prevOffset = sumWeekOffset - 1;
+  const prevDays = getWeekDates(prevOffset);
+  const prevKey = 'weight-' + dateKey(prevDays[0]);
+  const prev = JSON.parse(localStorage.getItem(prevKey) || '{}');
+
+  const renderDiff = (currentVal, prevVal, elId) => {
+    const el = document.getElementById(elId);
+    if (!currentVal || !prevVal) { el.textContent = prevVal ? `Prev: ${prevVal} kg` : ''; el.style.color = 'var(--text-light)'; return; }
+    const diff = (parseFloat(currentVal) - parseFloat(prevVal)).toFixed(1);
+    const isDown = diff < 0;
+    const isUp = diff > 0;
+    el.textContent = isDown ? `▼ ${Math.abs(diff)} kg from last week` : isUp ? `▲ +${diff} kg from last week` : `= Same as last week`;
+    el.style.color = isDown ? '#2e7d32' : isUp ? 'var(--red)' : 'var(--text-light)';
+  };
+
+  renderDiff(document.getElementById('w-zuri').value, prev.zuri, 'w-zuri-diff');
+  renderDiff(document.getElementById('w-paxton').value, prev.paxton, 'w-paxton-diff');
+}
+
+function toggleWeightHistory() {
+  const box = document.getElementById('w-history');
+  const btn = document.getElementById('w-hist-btn');
+  if (box.style.display === 'none') {
+    box.style.display = 'block';
+    btn.textContent = '📊 Hide weight history ▴';
+    renderWeightHistory();
+  } else {
+    box.style.display = 'none';
+    btn.textContent = '📊 Show weight history ▸';
+  }
+}
+
+function renderWeightHistory() {
+  const box = document.getElementById('w-history');
+  // Gather all weight keys
+  const all = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('weight-')) {
+      const d = JSON.parse(localStorage.getItem(k) || '{}');
+      if (d.zuri || d.paxton) all.push({ weekStart: k.replace('weight-',''), ...d });
+    }
+  }
+  all.sort((a,b) => b.weekStart.localeCompare(a.weekStart));
+
+  if (!all.length) { box.innerHTML = '<div style="font-size:13px;color:var(--text-light);padding:6px 0;">No weight data recorded yet.</div>'; return; }
+
+  box.innerHTML = `<div style="border-top:1px solid var(--border);padding-top:10px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-bottom:8px;">All Recorded Weights</div>
+    ${all.map(w => {
+      const d = new Date(w.weekStart + 'T12:00:00');
+      const wkLabel = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text-mid);font-weight:600;">Wk of ${wkLabel}</div>
+        <div style="display:flex;gap:14px;">
+          ${w.zuri ? `<span style="font-size:13px;font-weight:700;color:var(--zuri);">🟣 ${w.zuri} kg</span>` : ''}
+          ${w.paxton ? `<span style="font-size:13px;font-weight:700;color:var(--paxton);">🩵 ${w.paxton} kg</span>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function generateSummary() {
+  const days = getWeekDates(sumWeekOffset);
+  const dateKeys = days.map(d => dateKey(d));
+  const allEntries = getEntries();
+  const weekEntries = allEntries.filter(e => dateKeys.includes(e.date));
+  const output = document.getElementById('summary-output');
+
+  if (!weekEntries.length) {
+    output.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions this week</h3><p>Log some sessions first, then generate the summary.</p></div>`;
+    return;
+  }
+
+  output.innerHTML = '<div class="loading-box"><div class="spinner"></div>Generating summary…</div>';
+
+  const zuriE = weekEntries.filter(e => e.dog === 'zuri');
+  const paxE = weekEntries.filter(e => e.dog === 'paxton');
+
+  // Build daily breakdown string — multiple sessions per day
+  const buildDayLines = (allEntries, days, dog) => {
+    return days.map((d, i) => {
+      const dk = dateKey(d);
+      const dayEntries = allEntries.filter(x => x.date === dk);
+      const slots = dog === 'zuri' ? ['morning','afternoon'] : ['morning','midday','afternoon'];
+      const planLines = slots.map(slot => {
+        const p = getPlanSlot(dk, dog, slot);
+        return p ? `    ${slot}: ${p}` : '';
+      }).filter(Boolean).join('\n');
+      if (!dayEntries.length) return `${DAYS[i]} (${dk}): No session logged.\n  Plan:\n${planLines || '    none'}`;
+      const sessionLines = slots.map(slot => {
+        const e = dayEntries.find(x => x.session === slot) || dayEntries.find(x => !x.session && slot === 'morning');
+        if (!e) return `    ${slot}: not logged`;
+        return `    ${slot}:\n      Training: ${e.training}\n      Topics: ${(e.topics||[]).join(', ')||'none'}\n      Wins: ${e.wins.join(' | ')||'none'}\n      Challenges: ${(e.challenges||[]).join(' | ')||'none'}\n      Work on: ${e.workon||'none'}`;
+      }).join('\n');
+      const daveEntry = dayEntries.find(x => x.dave);
+      const videosEntry = dayEntries.find(x => x.videos);
+      const dave = daveEntry ? daveEntry.dave : 'none';
+      const videos = videosEntry ? videosEntry.videos : 'none';
+      const treatment = getPlanSlot(dk, dog, 'treatment');
+      const allFeedback = dayEntries.flatMap(x => x.feedbackItems || (x.dave ? [{who:'Dave', text:x.dave}] : []));
+      const allVideos = dayEntries.flatMap(x => x.videoItems || (x.videos ? [{url:'', desc:x.videos}] : []));
+      const feedbackStr = allFeedback.length ? allFeedback.map(f => (f.who||'Someone') + ': ' + f.text).join(' | ') : 'none';
+      const videosStr = allVideos.length ? allVideos.map(v => (v.url||'') + (v.desc ? ' — ' + v.desc : '')).filter(Boolean).join(' | ') : 'none';
+      return `${DAYS[i]} (${dk}):\n  Treatment: ${treatment||'none'}\n  Plan:\n${planLines||'    none'}\n  Sessions:\n${sessionLines}\n  Videos: ${videosStr}\n  Feedback: ${feedbackStr}`;
+    }).join('\n\n');
+  };
+
+  const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
+  // Collect competition data for this week
+  const weekCompDates = days.map(d => dateKey(d));
+  const weekComps = getComps().filter(c => weekCompDates.includes(c.date));
+  const compStr = weekComps.length ? weekComps.map(c => { const runs = c.runs||[]; return c.date + ': ' + c.location + (runs.length ? ' — ' + runs.length + ' run(s): ' + runs.map(r => (r.runClass||'Run') + ' — ' + (r.result||'') + (r.time ? ' ' + r.time : '') + (r.notes ? ' — ' + r.notes : '')).join('; ') : '') + (c.notes ? '. Overall: ' + c.notes : '') + (c.workon ? '. Work on: ' + c.workon : ''); }).join('\n') : 'No competitions this week';
+
+  const weightLine = `Zuri: ${weightData.zuri ? weightData.zuri + ' kg' : 'not recorded'}, Paxton: ${weightData.paxton ? weightData.paxton + ' kg' : 'not recorded'}${weightData.notes ? '. Notes: ' + weightData.notes : ''}`;
+
+  // Collect all feedback and videos for the week
+  const allFeedback = weekEntries.flatMap(e => e.feedbackItems || (e.dave ? [{who:'Dave', text:e.dave}] : []));
+  const allVideos = weekEntries.flatMap(e => e.videoItems || (e.videos ? [{url:'', desc:e.videos}] : []));
+  const feedbackStr = allFeedback.length ? allFeedback.map(f => (f.who||'Someone') + ':\n' + f.text).join('\n\n---\n\n') : 'None recorded';
+  const videosStr = allVideos.length ? allVideos.map(v => (v.desc||'') + (v.url ? ' — ' + v.url : '')).filter(Boolean).join('\n') : 'None recorded';
+
+  const prompt = `You are an expert dog training coach reviewing a week of training logs. Produce a thorough, structured weekly summary.
+
+WEEK: ${weekDatesStr(days)}
+WEIGHTS THIS WEEK: ${weightLine}
+
+=== ZURI (${zuriE.length} sessions logged — morning & afternoon) ===
+${buildDayLines(zuriE, days, 'zuri')}
+
+=== PAXTON (${paxE.length} sessions logged — morning, midday & afternoon) ===
+${buildDayLines(paxE, days, 'paxton')}
+
+=== COMPETITION RESULTS THIS WEEK ===
+\${compStr}
+
+=== ALL FEEDBACK THIS WEEK ===
+${feedbackStr}
+
+=== ALL VIDEOS SENT THIS WEEK ===
+${videosStr}
+
+Respond ONLY with a JSON object (no markdown, no backticks):
+{
+  "week_theme": "One overarching theme or headline for this training week",
+  "zuri_overall": "2-3 sentences on Zuri's week overall — consistency, energy, progress",
+  "zuri_wins": "The standout wins for Zuri this week",
+  "zuri_challenges": "Key challenges for Zuri and what they indicate",
+  "zuri_top5_actions": ["Action 1 for Zuri next week", "Action 2 for Zuri next week", "Action 3 for Zuri next week", "Action 4 for Zuri next week", "Action 5 for Zuri next week"],
+  "paxton_overall": "2-3 sentences on Paxton's week overall",
+  "paxton_wins": "The standout wins for Paxton this week",
+  "paxton_challenges": "Key challenges for Paxton and what they indicate",
+  "paxton_top5_actions": ["Action 1 for Paxton next week", "Action 2 for Paxton next week", "Action 3 for Paxton next week", "Action 4 for Paxton next week", "Action 5 for Paxton next week"],
+  "weight_notes": "Brief comment on their weights this week if recorded — trends, whether on track, anything to watch",
+  "feedback_debrief": "A thorough debrief of ALL feedback received this week — analyse what each person said, identify key themes across all coaches, what it means for training going forward, and what to prioritise",
+  "dave_themes": "Dave's specific coaching themes and recommendations verbatim and analysed (or 'No feedback recorded' if none)",
+  "comp_notes": "Any competition results this week — how Zuri performed, what it showed about her training, key takeaways (omit if no competitions)",
+  "treatment_notes": "Any physio/massage/treatment this week and how it may affect training (omit if none recorded)",
+  "sessions_missed": "Any days with no session logged and whether it matters",
+  "encouragement": "A warm, specific sentence of encouragement for the trainer based on this week"
+}`;
+
+  try {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
+      method: 'POST',
+      headers: ANTHROPIC_HEADERS,
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 3000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const rawText = await res.text();
+    console.log('Worker response status:', res.status);
+    console.log('Worker response:', rawText.substring(0, 200));
+    const data = JSON.parse(rawText);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const s = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    output.innerHTML = `
+      <div class="summary-card" style="background:linear-gradient(135deg,var(--zuri-light) 0%,var(--paxton-light) 100%);">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:5px;">✨ Week Theme</div>
+        <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--text-dark);line-height:1.3;">${s.week_theme}</div>
+      </div>
+
+      <div class="summary-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div class="dog-badge zuri">🟣 Zuri — ${zuriE.length} sessions</div></div>
+        <div class="summary-section"><h4>Overall</h4><p class="summary-text">${s.zuri_overall}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>✨ Wins</h4><p class="summary-text">${s.zuri_wins}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.zuri_challenges}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>🎯 Top 5 Actions for Next Week</h4>
+          ${(s.zuri_top5_actions||[]).map((a,i) => '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--zuri);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(i+1)+'</div><p class="summary-text" style="margin:0;padding-top:2px;">'+a+'</p></div>').join('')}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div class="dog-badge paxton">🩵 Paxton — ${paxE.length} sessions</div></div>
+        <div class="summary-section"><h4>Overall</h4><p class="summary-text">${s.paxton_overall}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>✨ Wins</h4><p class="summary-text">${s.paxton_wins}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>⚠️ Challenges</h4><p class="summary-text">${s.paxton_challenges}</p></div>
+        <div class="divider"></div>
+        <div class="summary-section"><h4>🎯 Top 5 Actions for Next Week</h4>
+          ${(s.paxton_top5_actions||[]).map((a,i) => '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;"><div style="width:24px;height:24px;border-radius:50%;background:var(--paxton);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">'+(i+1)+'</div><p class="summary-text" style="margin:0;padding-top:2px;">'+a+'</p></div>').join('')}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        ${allFeedback.length ? '<div class="summary-section"><h4>💬 All Feedback This Week</h4>' +
+          allFeedback.map(f => '<div style="background:var(--parchment);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--zuri);">' +
+            '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--zuri);margin-bottom:6px;">— ' + (f.who||'Feedback') + '</div>' +
+            '<p class="summary-text" style="white-space:pre-wrap;">' + f.text + '</p>' +
+          '</div>').join('') +
+          '</div><div class="divider"></div>' : ''}
+        ${s.feedback_debrief ? '<div class="summary-section"><h4>🔍 Feedback Debrief</h4><p class="summary-text">'+s.feedback_debrief+'</p></div><div class="divider"></div>' : ''}
+        ${s.dave_themes && s.dave_themes !== 'No feedback recorded' ? '<div class="summary-section"><h4>👨‍🏫 Dave\'s Coaching Themes</h4><p class="summary-text">'+s.dave_themes+'</p></div><div class="divider"></div>' : ''}
+        ${(function() {
+          // Collect ALL videos from the week with full context
+          const videoSections = [];
+          
+          // Training session videos
+          weekEntries.forEach(e => {
+            const vids = e.videoItems || (e.videos ? [{url:'', desc:e.videos}] : []);
+            if (!vids.length) return;
+            const d = new Date(e.date + 'T12:00:00');
+            const dStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+            const dogName = e.dog === 'zuri' ? '🟣 Zuri' : '🩵 Paxton';
+            const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+            vids.filter(v => v.url || v.desc).forEach(v => {
+              videoSections.push({
+                heading: dogName + ' — ' + dStr + (slotIcon ? ' ' + slotIcon + ' ' + e.session : ''),
+                desc: v.desc || '',
+                url: v.url || '',
+                type: 'training'
+              });
+            });
+          });
+          
+          // Competition run videos
+          weekComps.forEach(c => {
+            const d = new Date(c.date + 'T12:00:00');
+            const dStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+            (c.runs||[]).forEach((r, i) => {
+              if (r.videoUrl || r.videoDesc) {
+                videoSections.push({
+                  heading: '🏆 Comp — ' + c.location + ' — ' + dStr + ' Run ' + (i+1) + (r.runClass ? ' (' + r.runClass + ')' : ''),
+                  desc: r.videoDesc || '',
+                  url: r.videoUrl || '',
+                  type: 'comp'
+                });
+              }
+            });
+          });
+
+          if (!videoSections.length) return '';
+          return '<div class="summary-section"><h4>📹 All Videos This Week (' + videoSections.length + ')</h4>' +
+            videoSections.map(v =>
+              '<div style="background:var(--parchment);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid ' + (v.type==='comp' ? 'var(--zuri)' : 'var(--paxton)') + ';">' +
+                '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-bottom:4px;">' + v.heading + '</div>' +
+                (v.desc ? '<div style="font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:4px;">' + v.desc + '</div>' : '') +
+                (v.url ? '<a href="' + v.url + '" target="_blank" style="font-size:12px;color:var(--zuri);word-break:break-all;">' + v.url + '</a>' : '<span style="font-size:12px;color:var(--text-light);">No link added</span>') +
+              '</div>'
+            ).join('') +
+          '</div><div class="divider"></div>';
+        })()} 
+        ${weekComps.length ? '<div class="summary-section"><h4>🏆 Competition This Week</h4>' + weekComps.map(c => '<div style="background:var(--zuri-light);border-radius:8px;padding:10px;margin-bottom:6px;"><div style="font-weight:700;color:var(--zuri);margin-bottom:3px;">📍 ' + c.location + (c.compClass ? ' — ' + c.compClass : '') + '</div><div style="font-size:13px;">' + c.result + (c.resultDetail ? ': ' + c.resultDetail : '') + '</div>' + (s.comp_notes ? '<div style="font-size:13px;margin-top:6px;color:var(--text-mid);">' + s.comp_notes + '</div>' : '') + '</div>').join('') + '</div><div class="divider"></div>' : ''}
+        ${s.treatment_notes ? '<div class="summary-section"><h4>💆 Treatment & Recovery</h4><p class="summary-text">'+s.treatment_notes+'</p></div><div class="divider"></div>' : ''}
+        ${s.weight_notes ? '<div class="summary-section"><h4>⚖️ Weight Check-in</h4><p class="summary-text">'+s.weight_notes+'</p></div><div class="divider"></div>' : ''}
+        ${s.sessions_missed ? '<div class="summary-section"><h4>📅 Sessions Missed</h4><p class="summary-text">'+s.sessions_missed+'</p></div><div class="divider"></div>' : ''}
+        <div class="summary-section"><p class="summary-text" style="font-style:italic;color:var(--zuri);">${s.encouragement}</p></div>
+      </div>
+    `;
+
+    // Show print/copy buttons
+    const shareBtns = document.getElementById('summary-share-btns');
+    if (shareBtns) shareBtns.style.display = 'flex';
+    // Auto-generate Paxton's letter
+    document.getElementById('paxton-letter-output').innerHTML = '<div class="loading-box" style="margin-top:12px;"><div class="spinner"></div>Paxton is writing to his nannas...</div>';
+    generatePaxtonLetter(days, paxtonEntries, weekComps);
+  } catch(err) {
+    console.error('Summary error:', err);
+    output.innerHTML = `<div class="summary-card" style="color:#b91c1c;text-align:center;padding:20px;"><p style="font-size:14px;">Couldn't generate summary.</p><p style="font-size:12px;margin-top:8px;color:#666;">${err.message || err}</p></div>`;
+  }
+}
+
+// ─── PAXTON'S LETTER TO NANNAS ───────────────────────────────────
+async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
+  const output = document.getElementById('paxton-letter-output');
+  if (!output) return;
+
+  // If called standalone without args, collect data
+  if (!days) {
+    days = getWeekDates(sumWeekOffset);
+    const dateKeys = days.map(d => dateKey(d));
+    const allEntries = getEntries();
+    paxtonEntries = allEntries.filter(e => dateKeys.includes(e.date) && e.dog === 'paxton');
+    weekComps = getComps().filter(c => dateKeys.includes(c.date));
+  }
+
+  const sessionSummary = paxtonEntries.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    return d.toLocaleDateString('en-US',{weekday:'long'}) + ' ' + (e.session||'') + ': ' +
+      (e.sessionTopics && e.sessionTopics.length ? e.sessionTopics.join(', ') : e.training) +
+      (e.wins && e.wins.length ? '. Wins: ' + e.wins.join(', ') : '') +
+      (e.challenges && e.challenges.length ? '. Tricky bits: ' + e.challenges.join(', ') : '');
+  }).join('\n');
+
+  const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
+  const paxtonWeight = weightData.paxton || null;
+
+  const prompt = `You are writing a weekly journal letter FROM THE DOG Paxton to his nannas. 
+
+Paxton is a dog who is bouncy, funny and cheeky. He loves his training sessions but also finds ways to be cheeky about them. He calls his owner "Mum". He gets very excited about treats, play and cuddles. He talks about training like a funny, enthusiastic dog would - not always understanding everything perfectly but trying his best and being very proud of himself.
+
+Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them all about his week. It should:
+- Be written entirely in Paxton's voice as a dog
+- Reference the actual training he did this week
+- Be funny and charming with dog-like observations (getting distracted by smells, being very proud of himself, wondering what treats he'll get)
+- Mention if he had any physio/treatment in a funny dog way
+- Include any competition results if relevant
+- End with lots of love and maybe asking nannas for treats
+- Be about 3-4 paragraphs long
+- Feel like it was genuinely written by a bouncy cheeky dog
+
+PAXTON'S WEEK:
+${sessionSummary || 'Not much training this week - mostly resting and being handsome'}
+${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg' : ''}
+${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location + ' — ' + (c.runs||[]).map(r => r.runClass + ' ' + r.result).join(', ')).join('; ') : ''}
+
+Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints.`;
+
+  try {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
+      method: 'POST',
+      headers: ANTHROPIC_HEADERS,
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const rawText = await res.text();
+    const data = JSON.parse(rawText);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const letter = (data.content && data.content[0] && data.content[0].text) || '';
+
+    const weekLabel = document.getElementById('sum-week-label').textContent;
+    const weekDates = document.getElementById('sum-week-dates').textContent;
+
+    output.innerHTML =
+      '<div class="summary-card" style="background:linear-gradient(135deg,var(--paxton-light) 0%,var(--teal-light,#e0f4f2) 100%);border:2px solid var(--paxton);">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">' +
+          '<div style="font-size:32px;">🐾</div>' +
+          '<div>' +
+            '<div style="font-family:Fraunces,serif;font-size:18px;font-weight:700;color:var(--paxton);">Paxton\'s Letter to Nannas</div>' +
+            '<div style="font-size:12px;color:var(--text-light);">' + weekLabel + ' · ' + weekDates + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:15px;line-height:1.8;color:var(--text-dark);white-space:pre-wrap;font-style:italic;">' + letter + '</div>' +
+        '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">' +
+          '<button onclick="printPaxtonLetter()" style="flex:1;min-width:120px;padding:10px;border:none;border-radius:10px;background:var(--paxton);color:white;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">🖨️ Print</button>' +
+          '<button onclick="copyPaxtonLetter()" id="copy-paxton-btn" style="flex:1;min-width:120px;padding:10px;border:1.5px solid var(--paxton);border-radius:10px;background:white;color:var(--paxton);font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📋 Copy</button>' +
+          '<button onclick="sharePaxtonLetter()" style="flex:1;min-width:120px;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--paxton),#1a7a6e);color:white;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📤 Share</button>' +
+        '</div>' +
+      '</div>';
+
+  } catch(err) {
+    output.innerHTML = '<div class="summary-card" style="color:#b91c1c;text-align:center;padding:20px;"><p>Paxton couldn\'t write his letter this time. Try again!</p><p style="font-size:12px;margin-top:6px;">' + (err.message||'') + '</p></div>';
+  }
+}
+
+function printPaxtonLetter() {
+  const content = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
+  if (!content) return;
+  const weekLabel = document.getElementById('sum-week-label').textContent;
+  const win = window.open('', '_blank');
+  win.document.write('<!DOCTYPE html><html><head><title>Paxton\'s Letter to Nannas</title><style>body{font-family:Georgia,serif;max-width:600px;margin:60px auto;padding:20px;color:#1A1A2E;line-height:1.8;font-size:16px;}h1{color:#2A9D8F;margin-bottom:4px;}p{margin:0 0 8px;}</style></head><body><h1>🐾 Paxton\'s Letter to Nannas</h1><p style="color:#7B72A8;font-size:13px;margin-bottom:30px;">' + weekLabel + '</p><div style="white-space:pre-wrap;">' + content.textContent + '</div></body></html>');
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+}
+
+function copyPaxtonLetter() {
+  const el = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = document.getElementById('copy-paxton-btn');
+    if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.textContent = '📋 Copy'; }, 2500); }
+    showToast('Letter copied! Send it to the nannas 🐾');
+  });
+}
+
+function sharePaxtonLetter() {
+  const el = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
+  if (!el) return;
+  const text = el.textContent;
+  const weekLabel = document.getElementById('sum-week-label').textContent;
+  if (navigator.share) {
+    navigator.share({
+      title: 'Paxton\'s Letter to Nannas — ' + weekLabel,
+      text: text,
+    }).catch(() => {});
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Copied! Paste it into WhatsApp or messages 🐾');
+    });
+  }
+}
+
+
+function printSummary() {
+  const weekLabel = document.getElementById('sum-week-label').textContent;
+  const weekDates = document.getElementById('sum-week-dates').textContent;
+  const content = document.getElementById('summary-output').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Zuri & Paxton Training Summary — ${weekLabel}</title>
+  <style>
+    body { font-family: Inter, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; color: #1A1A2E; }
+    h1 { font-family: Georgia, serif; color: #2C2A4A; margin-bottom: 4px; }
+    .week { color: #7B72A8; font-size: 14px; margin-bottom: 30px; }
+    .card { background: #f7f5fc; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #D8D3EC; }
+    h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7B72A8; margin-bottom: 6px; margin-top: 0; }
+    p { font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+    .divider { height: 1px; background: #D8D3EC; margin: 12px 0; }
+    a { color: #6C5BAE; }
+    .dog-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+    .zuri-badge { background: #EDE9F7; color: #6C5BAE; }
+    .paxton-badge { background: #E0F4F2; color: #2A9D8F; }
+    @media print { body { margin: 20px; } }
+  </style></head><body>
+  <h1>🐾 Zuri & Paxton Training Summary</h1>
+  <div class="week">${weekLabel} &nbsp;·&nbsp; ${weekDates}</div>
+  ${content}
+  <div style="margin-top:30px;font-size:12px;color:#7B72A8;border-top:1px solid #D8D3EC;padding-top:12px;">Generated by Zuri & Paxton Training Journal</div>
+  </body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 500);
+}
+
+function copySummary() {
+  const weekLabel = document.getElementById('sum-week-label').textContent;
+  const weekDates = document.getElementById('sum-week-dates').textContent;
+  const el = document.getElementById('summary-output');
+  
+  // Build plain text version
+  let text = 'ZURI & PAXTON TRAINING SUMMARY\n';
+  text += weekLabel + ' · ' + weekDates + '\n';
+  text += '='.repeat(40) + '\n\n';
+  
+  // Extract text from all summary sections
+  el.querySelectorAll('.summary-section').forEach(section => {
+    const h4 = section.querySelector('h4');
+    const p = section.querySelector('p');
+    if (h4) text += h4.textContent.toUpperCase() + '\n';
+    if (p) text += p.textContent + '\n\n';
+    // Action items
+    section.querySelectorAll('div[style*="border-radius:50%"]').forEach((dot, i) => {
+      const action = dot.nextElementSibling;
+      if (action) text += (i+1) + '. ' + action.textContent + '\n';
+    });
+  });
+
+  // Video links
+  el.querySelectorAll('a[href]').forEach(a => {
+    text += a.href + '\n';
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.textContent = '📋 Copy to Share'; }, 2500); }
+    showToast('Summary copied to clipboard!');
+  }).catch(() => {
+    showToast('Could not copy — try the Print button instead');
+  });
+}
+
+
+function startVoice(targetId, btnId) {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { showToast('Voice not supported in this browser'); return; }
+  const btn = document.getElementById(btnId);
+  if (activeVoiceBtn === btn && recognition) { recognition.stop(); return; }
+  if (recognition) recognition.stop();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true; recognition.interimResults = false; recognition.lang = 'en-US';
+  activeVoiceBtn = btn;
+  btn.className = 'voice-btn listening';
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Listening… tap to stop`;
+  recognition.onresult = e => {
+    const t = Array.from(e.results).map(r=>r[0].transcript).join(' ');
+    const el = document.getElementById(targetId);
+    if (el) { el.value = (el.value ? el.value + ' ' : '') + t; autoSave(); }
+  };
+  recognition.onend = () => {
+    btn.className = 'voice-btn';
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Tap to speak`;
+    activeVoiceBtn = null; recognition = null;
+  };
+  recognition.onerror = e => { showToast('Voice error: ' + e.error); recognition.stop(); };
+  recognition.start();
+}
+
+// ─── SCREENSHOT ───────────────────────────────────────────────────
+function handleScreenshot(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    screenshotB64 = ev.target.result.split(',')[1];
+    document.getElementById('ss-img').src = ev.target.result;
+    document.getElementById('ss-name').textContent = file.name;
+    document.getElementById('ss-preview').style.display = 'flex';
+    document.getElementById('ss-drop').style.display = 'none';
+  };
+  r.readAsDataURL(file);
+}
+
+function clearScreenshot() {
+  screenshotB64 = null;
+  const ssInput = document.getElementById('ss-input');
+  const ssPreview = document.getElementById('ss-preview');
+  const ssDrop = document.getElementById('ss-drop');
+  if (ssInput) ssInput.value = '';
+  if (ssPreview) ssPreview.style.display = 'none';
+  if (ssDrop) ssDrop.style.display = 'block';
+}
+
+async function readScreenshot() {
+  if (!screenshotB64) return;
+  const btn = document.getElementById('ai-read-btn');
+  const status = document.getElementById('ai-read-status');
+  btn.disabled = true; btn.textContent = 'Reading…'; status.style.display = 'block';
+  try {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
+      method: 'POST', headers: ANTHROPIC_HEADERS,
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: screenshotB64 } },
+        { type: 'text', text: 'This is a screenshot of feedback from a dog trainer named Dave. Transcribe all text exactly, then write "---" and a concise summary of his key points.' }
+      ]}]})
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const existing = val('l-dave').trim();
+    setVal('l-dave', existing ? existing + '\n\n' + text : text);
+    autoSave(); showToast('Screenshot read! 📋');
+  } catch { showToast('Could not read screenshot.'); }
+  finally { btn.disabled = false; btn.textContent = '✨ Read with AI'; status.style.display = 'none'; }
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+
+// ─── REFERENCE: Dave's Notes & Videos ────────────────────────────
+let refFilter = 'all';
+
+function filterRef(filter, btn) {
+  refFilter = filter;
+  document.querySelectorAll('.ref-filter-row .filter-chip').forEach(c => c.className = 'filter-chip');
+  const colorClass = filter === 'zuri' ? 'on-zuri' : filter === 'paxton' ? 'on-paxton' : 'on-all';
+  btn.classList.add(colorClass);
+  renderRef();
+}
+
+function renderRef() {
+  const list = document.getElementById('ref-list');
+  if (!list) return;
+  const entries = getEntries();
+
+  const filtered = entries.filter(e => {
+    const hasDave = e.dave && e.dave.trim();
+    const hasVideos = e.videos && e.videos.trim();
+    const hasTreatment = getPlanSlot(e.date, e.dog, 'treatment');
+    if (refFilter === 'zuri') return e.dog === 'zuri' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'paxton') return e.dog === 'paxton' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'dave') return hasDave;
+    if (refFilter === 'videos') return hasVideos;
+    return hasDave || hasVideos || hasTreatment;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="ref-empty"><div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-weight:700;color:var(--text-mid);margin-bottom:6px;">Nothing here yet</div><div>Log sessions with Dave\'s feedback, videos sent, or treatment notes and they\'ll appear here for easy reference.</div></div>';
+    return;
+  }
+
+  // Group by Mon–Sun week
+  const weekGroups = {};
+  filtered.forEach(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const mon = getMonday(d);
+    const wk = dateKey(mon);
+    if (!weekGroups[wk]) weekGroups[wk] = [];
+    weekGroups[wk].push(e);
+  });
+
+  const sortedWeeks = Object.keys(weekGroups).sort((a,b) => b.localeCompare(a));
+
+  list.innerHTML = sortedWeeks.map(wk => {
+    const mon = new Date(wk + 'T12:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const wkLabel = fmt(mon) + ' – ' + fmt(sun) + ', ' + mon.getFullYear();
+
+    const groupEntries = weekGroups[wk].sort((a,b) => a.date.localeCompare(b.date) || (a.session||'').localeCompare(b.session||''));
+
+    const cards = groupEntries.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const dStr = d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+      const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+      const slotStr = e.session ? slotIcon + ' ' + e.session.charAt(0).toUpperCase() + e.session.slice(1) : '';
+      const hasDave = e.dave && e.dave.trim();
+      const hasVideos = e.videos && e.videos.trim();
+      const treatment = getPlanSlot(e.date, e.dog, 'treatment');
+      const treatmentNotes = getPlanSlot(e.date, e.dog, 'treatment-notes');
+
+      if (!hasDave && !hasVideos && !treatment) return '';
+
+      return '<div class="ref-entry">' +
+        '<div class="ref-entry-header">' +
+          '<div class="dog-badge ' + e.dog + '">' + (e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton') + '</div>' +
+          '<div class="ref-date-tag">' + dStr + '</div>' +
+          (slotStr ? '<div class="ref-slot-tag">' + slotStr + '</div>' : '') +
+        '</div>' +
+        (treatment ? '<div class="ref-section"><div class="ref-label">💆 Treatment / Physio</div><div class="ref-text" style="color:var(--paxton);font-weight:600;">' + treatment + '</div>' + (treatmentNotes ? '<div class="ref-text" style="margin-top:5px;">' + treatmentNotes + '</div>' : '') + '</div>' : '') +
+        (hasVideos ? '<div class="ref-section"><div class="ref-label">📹 Videos Sent to Dave</div><div class="ref-text">' + e.videos + '</div></div>' : '') +
+        (hasDave ? '<div class="ref-section"><div class="ref-label">💬 Dave\'s Feedback</div><div class="ref-text">' + e.dave + '</div></div>' : '') +
+        '<div class="ref-section" style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;"><div class="ref-label">Training covered</div><div style="font-size:12px;color:var(--text-mid);line-height:1.4;">' + e.training.substring(0,100) + (e.training.length>100?'...':'') + '</div></div>' +
+        '</div>';
+    }).filter(Boolean).join('');
+
+    if (!cards) return '';
+    return '<div class="ref-week-group">' +
+      '<div class="ref-week-heading"><span>Week of ' + wkLabel + '</span><span style="font-size:11px;font-weight:600;color:var(--text-light);">' + groupEntries.length + ' entries</span></div>' +
+      cards +
+      '</div>';
+  }).filter(Boolean).join('');
+
+  if (!list.innerHTML.trim()) {
+    list.innerHTML = '<div class="ref-empty">No matching entries found for this filter.</div>';
+  }
+}
+
+
+
+function addFeedbackToEntry(id) {
+  const who = document.getElementById('modal-who-' + id) ? document.getElementById('modal-who-' + id).value.trim() : '';
+  const text = document.getElementById('modal-fb-text-' + id) ? document.getElementById('modal-fb-text-' + id).value.trim() : '';
+  if (!text) { showToast('Please enter some feedback first'); return; }
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  if (!entries[idx].feedbackItems) entries[idx].feedbackItems = [];
+  entries[idx].feedbackItems.push({ who, text });
+  // update legacy dave field
+  if (who.toLowerCase().includes('dave')) {
+    entries[idx].dave = (entries[idx].dave ? entries[idx].dave + '\n\n' : '') + text;
+  }
+  saveEntries(entries);
+  showToast('Feedback saved! 💬');
+  openEntry(id); // refresh modal
+}
+
+// ─── MULTI FEEDBACK ──────────────────────────────────────────────
+let feedbackCount = 0;
+let videoCount = 0;
+
+function addFeedback(who='', text='', screenshotData=null) {
+  feedbackCount++;
+  const id = 'fb-' + feedbackCount;
+  const container = document.getElementById('feedback-container');
+  const div = document.createElement('div');
+  div.className = 'feedback-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="feedback-item-header">' +
+      '<input class="feedback-who-input" type="text" placeholder="Who? (Dave, Physio, Vet...)" value="' + escHtml(who) + '" oninput="autoSave()">' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<textarea style="min-height:70px;font-size:14px;" placeholder="Their feedback, notes or recommendations..." oninput="autoSave()">' + escHtml(text) + '</textarea>' +
+    '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">' +
+      '<div class="screenshot-drop" style="padding:8px;flex:1;" onclick="triggerFbScreenshot(\'' + id + '\')">' +
+        '<span style="font-size:13px;">📷 Upload screenshot</span>' +
+        '<input type="file" class="fb-ss-input" accept="image/*" style="display:none" onchange="handleFbScreenshot(event,\'' + id + '\')">' +
+      '</div>' +
+    '</div>' +
+    '<div class="fb-ss-preview" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;">' +
+      '<img class="fb-ss-img" style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">' +
+      '<div style="flex:1;">' +
+        '<button onclick="readFbScreenshot(\'' + id + '\')" class="fb-ai-btn" style="padding:5px 10px;background:var(--forest);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✨ Read with AI</button>' +
+        '<button onclick="clearFbScreenshot(\'' + id + '\')" style="margin-left:6px;padding:5px 8px;background:var(--parchment);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Remove</button>' +
+        '<div class="fb-ai-status" style="font-size:11px;color:var(--text-light);display:none;margin-top:3px;">Reading...</div>' +
+      '</div>' +
+    '</div>';
+  container.appendChild(div);
+  if (screenshotData) {
+    // restore screenshot preview if we have data
+  }
+  autoSave();
+}
+
+function loadFeedbackItems(items) {
+  document.getElementById('feedback-container').innerHTML = '';
+  feedbackCount = 0;
+  if (!items || !items.length) {
+    addFeedback('Dave', '');
+    return;
+  }
+  items.forEach(item => addFeedback(item.who || '', item.text || ''));
+}
+
+function triggerFbScreenshot(id) {
+  document.querySelector('#' + id + ' .fb-ss-input').click();
+}
+
+function handleFbScreenshot(event, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const item = document.getElementById(id);
+    const preview = item.querySelector('.fb-ss-preview');
+    const img = item.querySelector('.fb-ss-img');
+    img.src = ev.target.result;
+    img.dataset.b64 = ev.target.result.split(',')[1];
+    preview.style.display = 'flex';
+    item.querySelector('.screenshot-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFbScreenshot(id) {
+  const item = document.getElementById(id);
+  item.querySelector('.fb-ss-input').value = '';
+  item.querySelector('.fb-ss-preview').style.display = 'none';
+  item.querySelector('.screenshot-drop').style.display = 'block';
+}
+
+async function readFbScreenshot(id) {
+  const item = document.getElementById(id);
+  const img = item.querySelector('.fb-ss-img');
+  const b64 = img.dataset.b64;
+  if (!b64) return;
+  const btn = item.querySelector('.fb-ai-btn');
+  const status = item.querySelector('.fb-ai-status');
+  btn.disabled = true; btn.textContent = 'Reading...'; status.style.display = 'block';
+  try {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
+      method: 'POST', headers: ANTHROPIC_HEADERS,
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+        { type: 'text', text: 'Transcribe all text in this feedback screenshot exactly, then add a line "---" followed by a brief summary of the key points.' }
+      ]}]})
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const ta = item.querySelector('textarea');
+    ta.value = (ta.value ? ta.value + '\n\n' : '') + text;
+    autoSave(); showToast('Screenshot read! 📋');
+  } catch(e) { showToast('Could not read screenshot.'); }
+  finally { btn.disabled = false; btn.textContent = '✨ Read with AI'; status.style.display = 'none'; }
+}
+
+// ─── MULTI VIDEO ─────────────────────────────────────────────────
+function addVideo(url='', desc='') {
+  videoCount++;
+  const id = 'vid-' + videoCount;
+  const container = document.getElementById('videos-container');
+  const div = document.createElement('div');
+  div.className = 'video-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="video-item-header">' +
+      '<span class="video-type-badge">📹 Video</span>' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<input class="video-url-input" type="text" placeholder="YouTube link or video URL (optional)..." value="' + escHtml(url) + '" oninput="autoSave(); tryLoadThumb(\'' + id + '\')">' +
+    '<input class="video-desc-input" type="text" placeholder="What does this video show? e.g. Zuri heelwork clip..." value="' + escHtml(desc) + '" oninput="autoSave()">' +
+    '<img class="video-thumbnail" id="thumb-' + id + '">';
+  container.appendChild(div);
+  if (url) tryLoadThumb(id);
+  autoSave();
+}
+
+function loadVideoItems(items) {
+  document.getElementById('videos-container').innerHTML = '';
+  videoCount = 0;
+  if (!items || !items.length) {
+    addVideo('', '');
+    return;
+  }
+  items.forEach(item => addVideo(item.url || '', item.desc || ''));
+}
+
+function tryLoadThumb(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const url = item.querySelector('.video-url-input').value.trim();
+  const thumb = document.getElementById('thumb-' + id);
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) {
+    thumb.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+    thumb.style.display = 'block';
+  } else {
+    thumb.style.display = 'none';
+  }
+}
+
+
+// ─── COMPETITION LOG ─────────────────────────────────────────────────
+let compRunCount = 0;
+
+function getComps() { return JSON.parse(localStorage.getItem('comps') || '[]'); }
+function saveComps(c) { cloudSet('comps', JSON.stringify(c)); }
+
+function showCompForm() {
+  document.getElementById('comp-form').style.display = 'block';
+  document.getElementById('add-comp-btn').style.display = 'none';
+  document.getElementById('comp-date').value = todayKey();
+  document.getElementById('comp-location').value = '';
+  document.getElementById('comp-notes').value = '';
+  document.getElementById('comp-workon').value = '';
+  document.getElementById('comp-runs-container').innerHTML = '';
+  compRunCount = 0;
+  addCompRun(); // start with one run
+}
+
+function hideCompForm() {
+  document.getElementById('comp-form').style.display = 'none';
+  document.getElementById('add-comp-btn').style.display = 'block';
+}
+
+function addCompRun(run) {
+  const container = document.getElementById('comp-runs-container');
+  if (container.children.length >= 6) { showToast('Maximum 6 runs per competition'); return; }
+  compRunCount++;
+  const n = compRunCount;
+  const id = 'comp-run-' + n;
+  const r = run || {};
+  const div = document.createElement('div');
+  div.className = 'comp-card';
+  div.id = id;
+  div.style.cssText = 'border:1.5px solid var(--zuri);margin-bottom:10px;position:relative;';
+  div.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+      '<div style="font-family:Fraunces,serif;font-size:15px;font-weight:700;color:var(--zuri);">Run ' + n + '</div>' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove()" style="color:var(--red);">✕ Remove</button>' +
+    '</div>' +
+    '<div class="comp-field-label">🏅 Class / Level</div>' +
+    '<input type="text" class="run-class" placeholder="e.g. Novice Agility, Masters Jumping" value="' + escHtml(r.runClass||'') + '" style="min-height:unset;padding:9px 12px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">' +
+      '<div><div class="comp-field-label">📏 Course</div><input type="text" class="run-course" placeholder="e.g. 180m" value="' + escHtml(r.courseLength||'') + '" style="min-height:unset;padding:9px 10px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;"></div>' +
+      '<div><div class="comp-field-label">⏱️ Time</div><input type="text" class="run-time" placeholder="e.g. 38.2s" value="' + escHtml(r.time||'') + '" style="min-height:unset;padding:9px 10px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;"></div>' +
+      '<div><div class="comp-field-label">📊 Rate</div><input type="text" class="run-rate" placeholder="e.g. 4.7" value="' + escHtml(r.runRate||'') + '" style="min-height:unset;padding:9px 10px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;"></div>' +
+    '</div>' +
+    '<div class="comp-field-label" style="margin-top:8px;">✅ Result</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">' +
+      ['Qualified','Placed','Competed','Eliminated'].map(res => {
+        const active = (r.result||'Competed') === res;
+        return '<button class="run-result-tab" data-result="' + res + '" onclick="selectRunResult(this,\'' + id + '\')" style="padding:6px 12px;border-radius:20px;border:1.5px solid ' + (active ? 'var(--zuri)' : 'var(--border)') + ';background:' + (active ? 'var(--zuri)' : 'var(--parchment)') + ';color:' + (active ? 'white' : 'var(--text-mid)') + ';font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">' + (res==='Qualified'?'✅':res==='Placed'?'🏆':res==='Competed'?'🐾':'❌') + ' ' + res + '</button>';
+      }).join('') +
+    '</div>' +
+    '<input type="text" class="run-result-detail" placeholder="e.g. 1st place, 2 faults, clear round" value="' + escHtml(r.resultDetail||'') + '" style="min-height:unset;padding:9px 12px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;">' +
+    '<div class="comp-field-label">📝 Run Notes</div>' +
+    '<textarea class="run-notes" placeholder="How did this run go? What was good, what went wrong..." rows="2" style="min-height:52px;font-size:14px;">' + escHtml(r.notes||'') + '</textarea>' +
+    '<div class="comp-field-label" style="margin-top:8px;">📹 Run Video</div>' +
+    '<input type="text" class="run-video-url" placeholder="YouTube link..." value="' + escHtml(r.videoUrl||'') + '" style="min-height:unset;padding:9px 12px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;margin-bottom:6px;" oninput="tryRunThumb(\'' + id + '\')">' +
+    '<input type="text" class="run-video-desc" placeholder="What does this video show..." value="' + escHtml(r.videoDesc||'') + '" style="min-height:unset;padding:9px 12px;font-size:14px;width:100%;border:1.5px solid var(--border);border-radius:10px;">' +
+    '<img class="video-thumbnail run-thumb" id="run-thumb-' + id + '" style="display:none;margin-top:6px;">';
+  container.appendChild(div);
+  if (r.videoUrl) tryRunThumb(id);
+  // Update add button
+  const addBtn = document.getElementById('add-run-btn');
+  if (addBtn) addBtn.style.display = container.children.length >= 6 ? 'none' : 'flex';
+}
+
+function selectRunResult(btn, runId) {
+  const run = document.getElementById(runId);
+  if (!run) return;
+  run.querySelectorAll('.run-result-tab').forEach(b => {
+    const active = b.dataset.result === btn.dataset.result;
+    b.style.background = active ? 'var(--zuri)' : 'var(--parchment)';
+    b.style.color = active ? 'white' : 'var(--text-mid)';
+    b.style.borderColor = active ? 'var(--zuri)' : 'var(--border)';
+  });
+}
+
+function tryRunThumb(runId) {
+  const run = document.getElementById(runId);
+  if (!run) return;
+  const url = run.querySelector('.run-video-url').value.trim();
+  const thumb = document.getElementById('run-thumb-' + runId);
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch && thumb) {
+    thumb.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+    thumb.style.display = 'block';
+  } else if (thumb) {
+    thumb.style.display = 'none';
+  }
+}
+
+function collectCompRuns() {
+  const runs = [];
+  document.querySelectorAll('#comp-runs-container .comp-card').forEach(div => {
+    const activeResult = div.querySelector('.run-result-tab[style*="var(--zuri)"]');
+    runs.push({
+      runClass: div.querySelector('.run-class').value.trim(),
+      courseLength: div.querySelector('.run-course').value.trim(),
+      time: div.querySelector('.run-time').value.trim(),
+      runRate: div.querySelector('.run-rate').value.trim(),
+      result: activeResult ? activeResult.dataset.result : 'Competed',
+      resultDetail: div.querySelector('.run-result-detail').value.trim(),
+      notes: div.querySelector('.run-notes').value.trim(),
+      videoUrl: div.querySelector('.run-video-url').value.trim(),
+      videoDesc: div.querySelector('.run-video-desc').value.trim(),
+    });
+  });
+  return runs.filter(r => r.runClass || r.time || r.notes || r.videoUrl);
+}
+
+function saveComp() {
+  const date = document.getElementById('comp-date').value;
+  const location = document.getElementById('comp-location').value.trim();
+  if (!date || !location) { showToast('Please add at least a date and location!'); return; }
+
+  const runs = collectCompRuns();
+  const comp = {
+    id: Date.now(),
+    date,
+    location,
+    notes: document.getElementById('comp-notes').value.trim(),
+    workon: document.getElementById('comp-workon').value.trim(),
+    runs,
+  };
+
+  const comps = getComps();
+  comps.unshift(comp);
+  saveComps(comps);
+  hideCompForm();
+  renderCompLog();
+  showToast('Competition saved! 🏆');
+}
+
+function renderCompLog() {
+  const list = document.getElementById('comp-list');
+  if (!list) return;
+  const comps = getComps();
+
+  if (!comps.length) {
+    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><h3>No competitions yet</h3><p>Tap the button above to log Zuri\'s first competition!</p></div>';
+    return;
+  }
+
+  list.innerHTML = comps.map(c => {
+    const d = new Date(c.date + 'T12:00:00');
+    const dStr = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric', year:'numeric' });
+    const runs = c.runs || [];
+    const qualified = runs.filter(r => r.result === 'Qualified' || r.result === 'Placed').length;
+    const runSummary = runs.length ? runs.map(r => (r.runClass ? r.runClass : 'Run') + (r.result ? ' — ' + r.result : '') + (r.time ? ' (' + r.time + ')' : '')).join(' · ') : '';
+    return '<div class="comp-entry-card" onclick="openComp(' + c.id + ')">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">' +
+        '<div>' +
+          '<div class="comp-entry-date">' + dStr + '</div>' +
+          '<div class="comp-entry-location">📍 ' + c.location + '</div>' +
+          (runs.length ? '<div style="font-size:11px;font-weight:700;color:var(--zuri);margin-top:4px;">' + runs.length + ' run' + (runs.length>1?'s':'') + (qualified ? ' · ' + qualified + ' qualified' : '') + '</div>' : '') +
+        '</div>' +
+        (runs.length ? '<div class="comp-result-badge ' + (qualified > 0 ? 'qualified' : 'competed') + '">' + (qualified > 0 ? '✅ ' + qualified + 'Q' : '🐾 ' + runs.length + 'R') + '</div>' : '') +
+      '</div>' +
+      (runSummary ? '<div style="font-size:12px;color:var(--text-mid);margin-top:8px;line-height:1.5;">' + runSummary + '</div>' : '') +
+      (c.notes ? '<div style="font-size:13px;color:var(--text-mid);margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">' + c.notes + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function openComp(id) {
+  const comp = getComps().find(c => c.id === id);
+  if (!comp) return;
+  const d = new Date(comp.date + 'T12:00:00');
+  const dStr = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const runs = comp.runs || [];
+
+  document.getElementById('m-badge').textContent = '🟣 Zuri';
+  document.getElementById('m-badge').className = 'dog-badge zuri';
+  document.getElementById('m-title').textContent = '🏆 ' + dStr;
+
+  const runsHtml = runs.map((r, i) => {
+    const resultClass = r.result === 'Qualified' ? 'qualified' : r.result === 'Placed' ? 'placed' : r.result === 'Eliminated' ? 'eliminated' : 'competed';
+    return '<div style="background:var(--parchment);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--zuri);">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="font-family:Fraunces,serif;font-weight:700;color:var(--zuri);">Run ' + (i+1) + (r.runClass ? ' — ' + r.runClass : '') + '</div>' +
+        '<span class="comp-result-badge ' + resultClass + '">' + (r.result==='Qualified'?'✅':r.result==='Placed'?'🏆':r.result==='Eliminated'?'❌':'🐾') + ' ' + r.result + '</span>' +
+      '</div>' +
+      ((r.courseLength || r.time || r.runRate) ? '<div style="display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap;">' +
+        (r.courseLength ? '<span style="font-size:13px;">📏 ' + r.courseLength + '</span>' : '') +
+        (r.time ? '<span style="font-size:13px;font-weight:700;color:var(--zuri);">⏱️ ' + r.time + '</span>' : '') +
+        (r.runRate ? '<span style="font-size:13px;font-weight:700;color:var(--paxton);">📊 ' + r.runRate + '</span>' : '') +
+        (r.resultDetail ? '<span style="font-size:13px;color:var(--text-mid);">' + r.resultDetail + '</span>' : '') +
+      '</div>' : '') +
+      (r.notes ? '<div style="font-size:13px;line-height:1.5;margin-bottom:6px;">' + r.notes + '</div>' : '') +
+      (r.videoUrl ? '<a href="' + r.videoUrl + '" target="_blank" style="font-size:12px;color:var(--zuri);word-break:break-all;display:block;">' + (r.videoDesc||r.videoUrl) + '</a>' : '') +
+    '</div>';
+  }).join('');
+
+  document.getElementById('m-body').innerHTML =
+    '<div class="modal-section"><h4 class="neutral">📍 Location</h4><p>' + comp.location + '</p></div>' +
+    (comp.notes ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">📝 Overall Notes</h4><p>' + comp.notes + '</p></div>' : '') +
+    (comp.workon ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">🎯 Work On</h4><p>' + comp.workon + '</p></div>' : '') +
+    (runs.length ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">🏃 Runs (' + runs.length + ')</h4>' + runsHtml + '</div>' : '') +
+    '<div class="divider"></div>' +
+    '<button onclick="deleteComp(' + id + ')" style="padding:8px 14px;background:var(--red-light);color:var(--red);border:1.5px solid var(--red);border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Delete Competition</button>';
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function deleteComp(id) {
+  if (!confirm('Delete this competition entry?')) return;
+  const comps = getComps().filter(c => c.id !== id);
+  saveComps(comps);
+  closeModal();
+  renderCompLog();
+  showToast('Competition deleted');
+}
+
+// ─── REFERENCE: Dave's Notes & Videos ────────────────────────────
+
+function filterRef(filter, btn) {
+  refFilter = filter;
+  document.querySelectorAll('.ref-filter-row .filter-chip').forEach(c => c.className = 'filter-chip');
+  const colorClass = filter === 'zuri' ? 'on-zuri' : filter === 'paxton' ? 'on-paxton' : 'on-all';
+  btn.classList.add(colorClass);
+  renderRef();
+}
+
+function renderRef() {
+  const list = document.getElementById('ref-list');
+  if (!list) return;
+  const entries = getEntries();
+
+  const filtered = entries.filter(e => {
+    const hasDave = e.dave && e.dave.trim();
+    const hasVideos = e.videos && e.videos.trim();
+    const hasTreatment = getPlanSlot(e.date, e.dog, 'treatment');
+    if (refFilter === 'zuri') return e.dog === 'zuri' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'paxton') return e.dog === 'paxton' && (hasDave || hasVideos || hasTreatment);
+    if (refFilter === 'dave') return hasDave;
+    if (refFilter === 'videos') return hasVideos;
+    return hasDave || hasVideos || hasTreatment;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="ref-empty"><div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-weight:700;color:var(--text-mid);margin-bottom:6px;">Nothing here yet</div><div>Log sessions with Dave\'s feedback, videos sent, or treatment notes and they\'ll appear here for easy reference.</div></div>';
+    return;
+  }
+
+  // Group by Mon–Sun week
+  const weekGroups = {};
+  filtered.forEach(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const mon = getMonday(d);
+    const wk = dateKey(mon);
+    if (!weekGroups[wk]) weekGroups[wk] = [];
+    weekGroups[wk].push(e);
+  });
+
+  const sortedWeeks = Object.keys(weekGroups).sort((a,b) => b.localeCompare(a));
+
+  list.innerHTML = sortedWeeks.map(wk => {
+    const mon = new Date(wk + 'T12:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const wkLabel = fmt(mon) + ' – ' + fmt(sun) + ', ' + mon.getFullYear();
+
+    const groupEntries = weekGroups[wk].sort((a,b) => a.date.localeCompare(b.date) || (a.session||'').localeCompare(b.session||''));
+
+    const cards = groupEntries.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const dStr = d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+      const slotIcon = e.session === 'morning' ? '🌅' : e.session === 'midday' ? '☀️' : e.session === 'afternoon' ? '🌇' : '';
+      const slotStr = e.session ? slotIcon + ' ' + e.session.charAt(0).toUpperCase() + e.session.slice(1) : '';
+      const hasDave = e.dave && e.dave.trim();
+      const hasVideos = e.videos && e.videos.trim();
+      const treatment = getPlanSlot(e.date, e.dog, 'treatment');
+      const treatmentNotes = getPlanSlot(e.date, e.dog, 'treatment-notes');
+
+      if (!hasDave && !hasVideos && !treatment) return '';
+
+      return '<div class="ref-entry">' +
+        '<div class="ref-entry-header">' +
+          '<div class="dog-badge ' + e.dog + '">' + (e.dog==='zuri'?'🟣 Zuri':'🩵 Paxton') + '</div>' +
+          '<div class="ref-date-tag">' + dStr + '</div>' +
+          (slotStr ? '<div class="ref-slot-tag">' + slotStr + '</div>' : '') +
+        '</div>' +
+        (treatment ? '<div class="ref-section"><div class="ref-label">💆 Treatment / Physio</div><div class="ref-text" style="color:var(--paxton);font-weight:600;">' + treatment + '</div>' + (treatmentNotes ? '<div class="ref-text" style="margin-top:5px;">' + treatmentNotes + '</div>' : '') + '</div>' : '') +
+        (hasVideos ? '<div class="ref-section"><div class="ref-label">📹 Videos Sent to Dave</div><div class="ref-text">' + e.videos + '</div></div>' : '') +
+        (hasDave ? '<div class="ref-section"><div class="ref-label">💬 Dave\'s Feedback</div><div class="ref-text">' + e.dave + '</div></div>' : '') +
+        '<div class="ref-section" style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;"><div class="ref-label">Training covered</div><div style="font-size:12px;color:var(--text-mid);line-height:1.4;">' + e.training.substring(0,100) + (e.training.length>100?'...':'') + '</div></div>' +
+        '</div>';
+    }).filter(Boolean).join('');
+
+    if (!cards) return '';
+    return '<div class="ref-week-group">' +
+      '<div class="ref-week-heading"><span>Week of ' + wkLabel + '</span><span style="font-size:11px;font-weight:600;color:var(--text-light);">' + groupEntries.length + ' entries</span></div>' +
+      cards +
+      '</div>';
+  }).filter(Boolean).join('');
+
+  if (!list.innerHTML.trim()) {
+    list.innerHTML = '<div class="ref-empty">No matching entries found for this filter.</div>';
+  }
+}
+
+
+
+function addFeedbackToEntry(id) {
+  const who = document.getElementById('modal-who-' + id) ? document.getElementById('modal-who-' + id).value.trim() : '';
+  const text = document.getElementById('modal-fb-text-' + id) ? document.getElementById('modal-fb-text-' + id).value.trim() : '';
+  if (!text) { showToast('Please enter some feedback first'); return; }
+  const entries = getEntries();
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  if (!entries[idx].feedbackItems) entries[idx].feedbackItems = [];
+  entries[idx].feedbackItems.push({ who, text });
+  // update legacy dave field
+  if (who.toLowerCase().includes('dave')) {
+    entries[idx].dave = (entries[idx].dave ? entries[idx].dave + '\n\n' : '') + text;
+  }
+  saveEntries(entries);
+  showToast('Feedback saved! 💬');
+  openEntry(id); // refresh modal
+}
+
+// ─── MULTI FEEDBACK ──────────────────────────────────────────────
+
+function addFeedback(who='', text='', screenshotData=null) {
+  feedbackCount++;
+  const id = 'fb-' + feedbackCount;
+  const container = document.getElementById('feedback-container');
+  const div = document.createElement('div');
+  div.className = 'feedback-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="feedback-item-header">' +
+      '<input class="feedback-who-input" type="text" placeholder="Who? (Dave, Physio, Vet...)" value="' + escHtml(who) + '" oninput="autoSave()">' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<textarea style="min-height:70px;font-size:14px;" placeholder="Their feedback, notes or recommendations..." oninput="autoSave()">' + escHtml(text) + '</textarea>' +
+    '<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">' +
+      '<div class="screenshot-drop" style="padding:8px;flex:1;" onclick="triggerFbScreenshot(\'' + id + '\')">' +
+        '<span style="font-size:13px;">📷 Upload screenshot</span>' +
+        '<input type="file" class="fb-ss-input" accept="image/*" style="display:none" onchange="handleFbScreenshot(event,\'' + id + '\')">' +
+      '</div>' +
+    '</div>' +
+    '<div class="fb-ss-preview" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;">' +
+      '<img class="fb-ss-img" style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">' +
+      '<div style="flex:1;">' +
+        '<button onclick="readFbScreenshot(\'' + id + '\')" class="fb-ai-btn" style="padding:5px 10px;background:var(--forest);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✨ Read with AI</button>' +
+        '<button onclick="clearFbScreenshot(\'' + id + '\')" style="margin-left:6px;padding:5px 8px;background:var(--parchment);color:var(--text-mid);border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Remove</button>' +
+        '<div class="fb-ai-status" style="font-size:11px;color:var(--text-light);display:none;margin-top:3px;">Reading...</div>' +
+      '</div>' +
+    '</div>';
+  container.appendChild(div);
+  if (screenshotData) {
+    // restore screenshot preview if we have data
+  }
+  autoSave();
+}
+
+function loadFeedbackItems(items) {
+  document.getElementById('feedback-container').innerHTML = '';
+  feedbackCount = 0;
+  if (!items || !items.length) {
+    addFeedback('Dave', '');
+    return;
+  }
+  items.forEach(item => addFeedback(item.who || '', item.text || ''));
+}
+
+function triggerFbScreenshot(id) {
+  document.querySelector('#' + id + ' .fb-ss-input').click();
+}
+
+function handleFbScreenshot(event, id) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const item = document.getElementById(id);
+    const preview = item.querySelector('.fb-ss-preview');
+    const img = item.querySelector('.fb-ss-img');
+    img.src = ev.target.result;
+    img.dataset.b64 = ev.target.result.split(',')[1];
+    preview.style.display = 'flex';
+    item.querySelector('.screenshot-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFbScreenshot(id) {
+  const item = document.getElementById(id);
+  item.querySelector('.fb-ss-input').value = '';
+  item.querySelector('.fb-ss-preview').style.display = 'none';
+  item.querySelector('.screenshot-drop').style.display = 'block';
+}
+
+async function readFbScreenshot(id) {
+  const item = document.getElementById(id);
+  const img = item.querySelector('.fb-ss-img');
+  const b64 = img.dataset.b64;
+  if (!b64) return;
+  const btn = item.querySelector('.fb-ai-btn');
+  const status = item.querySelector('.fb-ai-status');
+  btn.disabled = true; btn.textContent = 'Reading...'; status.style.display = 'block';
+  try {
+    const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
+      method: 'POST', headers: ANTHROPIC_HEADERS,
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+        { type: 'text', text: 'Transcribe all text in this feedback screenshot exactly, then add a line "---" followed by a brief summary of the key points.' }
+      ]}]})
+    });
+    const data = await res.json();
+    const text = (data.content && data.content[0] && data.content[0].text) || '';
+    const ta = item.querySelector('textarea');
+    ta.value = (ta.value ? ta.value + '\n\n' : '') + text;
+    autoSave(); showToast('Screenshot read! 📋');
+  } catch(e) { showToast('Could not read screenshot.'); }
+  finally { btn.disabled = false; btn.textContent = '✨ Read with AI'; status.style.display = 'none'; }
+}
+
+// ─── MULTI VIDEO ─────────────────────────────────────────────────
+function addVideo(url='', desc='') {
+  videoCount++;
+  const id = 'vid-' + videoCount;
+  const container = document.getElementById('videos-container');
+  const div = document.createElement('div');
+  div.className = 'video-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="video-item-header">' +
+      '<span class="video-type-badge">📹 Video</span>' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove(); autoSave()">✕ Remove</button>' +
+    '</div>' +
+    '<input class="video-url-input" type="text" placeholder="YouTube link or video URL (optional)..." value="' + escHtml(url) + '" oninput="autoSave(); tryLoadThumb(\'' + id + '\')">' +
+    '<input class="video-desc-input" type="text" placeholder="What does this video show? e.g. Zuri heelwork clip..." value="' + escHtml(desc) + '" oninput="autoSave()">' +
+    '<img class="video-thumbnail" id="thumb-' + id + '">';
+  container.appendChild(div);
+  if (url) tryLoadThumb(id);
+  autoSave();
+}
+
+function loadVideoItems(items) {
+  document.getElementById('videos-container').innerHTML = '';
+  videoCount = 0;
+  if (!items || !items.length) {
+    addVideo('', '');
+    return;
+  }
+  items.forEach(item => addVideo(item.url || '', item.desc || ''));
+}
+
+function tryLoadThumb(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const url = item.querySelector('.video-url-input').value.trim();
+  const thumb = document.getElementById('thumb-' + id);
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) {
+    thumb.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+    thumb.style.display = 'block';
+  } else {
+    thumb.style.display = 'none';
+  }
+}
+
+
+// ─── COMPETITION LOG ─────────────────────────────────────────────────
+let selectedCompResult = 'Qualified';
+let compVideoCount = 0;
+
+function getComps() { return JSON.parse(localStorage.getItem('comps') || '[]'); }
+function saveComps(c) { cloudSet('comps', JSON.stringify(c)); }
+
+function showCompForm() {
+  document.getElementById('comp-form').style.display = 'block';
+  document.getElementById('add-comp-btn').style.display = 'none';
+  // Set date to today
+  document.getElementById('comp-date').value = todayKey();
+  // Reset form
+  document.getElementById('comp-location').value = '';
+  document.getElementById('comp-class').value = '';
+  document.getElementById('comp-course-length').value = '';
+  document.getElementById('comp-time').value = '';
+  document.getElementById('comp-run-rate').value = '';
+  document.getElementById('comp-result-detail').value = '';
+  document.getElementById('comp-notes').value = '';
+  document.getElementById('comp-workon').value = '';
+  document.getElementById('comp-videos-container').innerHTML = '';
+  compVideoCount = 0;
+  addCompVideo();
+  selectedCompResult = 'Qualified';
+  document.querySelectorAll('.comp-result-tab').forEach(btn => {
+    btn.style.background = btn.dataset.result === 'Qualified' ? 'var(--zuri)' : 'var(--parchment)';
+    btn.style.color = btn.dataset.result === 'Qualified' ? 'white' : 'var(--text-mid)';
+    btn.style.borderColor = btn.dataset.result === 'Qualified' ? 'var(--zuri)' : 'var(--border)';
+  });
+}
+
+function hideCompForm() {
+  document.getElementById('comp-form').style.display = 'none';
+  document.getElementById('add-comp-btn').style.display = 'block';
+}
+
+function selectCompResult(btn) {
+  selectedCompResult = btn.dataset.result;
+  document.querySelectorAll('.comp-result-tab').forEach(b => {
+    const active = b.dataset.result === selectedCompResult;
+    b.style.background = active ? 'var(--zuri)' : 'var(--parchment)';
+    b.style.color = active ? 'white' : 'var(--text-mid)';
+    b.style.borderColor = active ? 'var(--zuri)' : 'var(--border)';
+  });
+}
+
+function addCompVideo(url='', desc='') {
+  compVideoCount++;
+  const id = 'comp-vid-' + compVideoCount;
+  const container = document.getElementById('comp-videos-container');
+  const div = document.createElement('div');
+  div.className = 'video-item';
+  div.id = id;
+  div.innerHTML =
+    '<div class="video-item-header">' +
+      '<span class="video-type-badge">📹 Video</span>' +
+      '<button class="remove-item-btn" onclick="document.getElementById(\'' + id + '\').remove()">✕ Remove</button>' +
+    '</div>' +
+    '<input class="video-url-input" type="text" placeholder="YouTube link or video URL..." value="' + escHtml(url) + '" oninput="tryCompThumb(\'' + id + '\')">' +
+    '<input class="video-desc-input" type="text" placeholder="What does this video show..." value="' + escHtml(desc) + '">' +
+    '<img class="video-thumbnail" id="thumb-' + id + '">';
+  container.appendChild(div);
+  if (url) tryCompThumb(id);
+}
+
+function tryCompThumb(id) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  const url = item.querySelector('.video-url-input').value.trim();
+  const thumb = document.getElementById('thumb-' + id);
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch && thumb) {
+    thumb.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+    thumb.style.display = 'block';
+  } else if (thumb) {
+    thumb.style.display = 'none';
+  }
+}
+
+function saveComp() {
+  const date = document.getElementById('comp-date').value;
+  const location = document.getElementById('comp-location').value.trim();
+  if (!date || !location) { showToast('Please add at least a date and location!'); return; }
+
+  const videos = [];
+  document.querySelectorAll('#comp-videos-container .video-item').forEach(item => {
+    const url = item.querySelector('.video-url-input').value.trim();
+    const desc = item.querySelector('.video-desc-input').value.trim();
+    if (url || desc) videos.push({ url, desc });
+  });
+
+  const comp = {
+    id: Date.now(),
+    date,
+    location,
+    compClass: document.getElementById('comp-class').value.trim(),
+    courseLength: document.getElementById('comp-course-length').value.trim(),
+    time: document.getElementById('comp-time').value.trim(),
+    runRate: document.getElementById('comp-run-rate').value.trim(),
+    result: selectedCompResult,
+    resultDetail: document.getElementById('comp-result-detail').value.trim(),
+    notes: document.getElementById('comp-notes').value.trim(),
+    workon: document.getElementById('comp-workon').value.trim(),
+    videos,
+  };
+
+  const comps = getComps();
+  comps.unshift(comp);
+  saveComps(comps);
+  hideCompForm();
+  renderCompLog();
+  showToast('Competition saved! 🏆');
+}
+
+function renderCompLog() {
+  const list = document.getElementById('comp-list');
+  if (!list) return;
+  const comps = getComps();
+
+  if (!comps.length) {
+    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><h3>No competitions yet</h3><p>Tap the button above to log Zuri\'s first competition result!</p></div>';
+    return;
+  }
+
+  list.innerHTML = comps.map(c => {
+    const d = new Date(c.date + 'T12:00:00');
+    const dStr = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric', year:'numeric' });
+    const resultClass = c.result === 'Qualified' ? 'qualified' : c.result === 'Placed' ? 'placed' : c.result === 'Eliminated' ? 'eliminated' : 'competed';
+    const resultEmoji = c.result === 'Qualified' ? '✅' : c.result === 'Placed' ? '🏆' : c.result === 'Eliminated' ? '❌' : '🐾';
+    return '<div class="comp-entry-card" onclick="openComp(' + c.id + ')">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">' +
+        '<div>' +
+          '<div class="comp-entry-date">' + dStr + '</div>' +
+          '<div class="comp-entry-location">📍 ' + c.location + '</div>' +
+          (c.compClass ? '<div class="comp-entry-class">🏅 ' + c.compClass + '</div>' : '') +
+        '</div>' +
+        '<div class="comp-result-badge ' + resultClass + '">' + resultEmoji + ' ' + c.result + '</div>' +
+      '</div>' +
+      (c.resultDetail ? '<div style="font-size:13px;color:var(--text-mid);margin-top:8px;font-weight:600;">' + c.resultDetail + '</div>' : '') +
+      ((c.courseLength || c.time || c.runRate) ? '<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">' +
+        (c.courseLength ? '<span style="font-size:12px;color:var(--text-light);">📏 ' + c.courseLength + '</span>' : '') +
+        (c.time ? '<span style="font-size:12px;font-weight:700;color:var(--zuri);">⏱️ ' + c.time + '</span>' : '') +
+        (c.runRate ? '<span style="font-size:12px;font-weight:700;color:var(--paxton);">📊 ' + c.runRate + '</span>' : '') +
+      '</div>' : '') +
+      (c.notes ? '<div style="font-size:13px;color:var(--text-mid);margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">' + c.notes + '</div>' : '') +
+      (c.videos && c.videos.length ? '<div style="margin-top:6px;font-size:11px;color:var(--zuri);font-weight:600;">📹 ' + c.videos.length + ' video' + (c.videos.length > 1 ? 's' : '') + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function openComp(id) {
+  const comp = getComps().find(c => c.id === id);
+  if (!comp) return;
+  const d = new Date(comp.date + 'T12:00:00');
+  const dStr = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const resultClass = comp.result === 'Qualified' ? 'qualified' : comp.result === 'Placed' ? 'placed' : comp.result === 'Eliminated' ? 'eliminated' : 'competed';
+
+  document.getElementById('m-badge').textContent = '🟣 Zuri';
+  document.getElementById('m-badge').className = 'dog-badge zuri';
+  document.getElementById('m-title').textContent = '🏆 ' + dStr;
+
+  document.getElementById('m-body').innerHTML =
+    '<div class="modal-section"><h4 class="neutral">📍 Location</h4><p>' + comp.location + '</p></div>' +
+    (comp.compClass ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">🏅 Class / Level</h4><p>' + comp.compClass + '</p></div>' : '') +
+    ((comp.courseLength || comp.time || comp.runRate) ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">📊 Run Stats</h4><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">' +
+      (comp.courseLength ? '<div><div style="font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">📏 Course Length</div><div style="font-size:15px;font-weight:700;color:var(--text-dark);">' + comp.courseLength + '</div></div>' : '<div></div>') +
+      (comp.time ? '<div><div style="font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">⏱️ My Time</div><div style="font-size:15px;font-weight:700;color:var(--zuri);">' + comp.time + '</div></div>' : '<div></div>') +
+      (comp.runRate ? '<div><div style="font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;">📊 Run Rate</div><div style="font-size:15px;font-weight:700;color:var(--paxton);">' + comp.runRate + '</div></div>' : '<div></div>') +
+      '</div></div>' : '') +
+    '<div class="divider"></div>' +
+    '<div class="modal-section"><h4 class="neutral">✅ Result</h4>' +
+      '<span class="comp-result-badge ' + resultClass + '" style="display:inline-block;margin-bottom:6px;">' + comp.result + '</span>' +
+      (comp.resultDetail ? '<p>' + comp.resultDetail + '</p>' : '') +
+    '</div>' +
+    (comp.notes ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">📝 Performance Notes</h4><p>' + comp.notes + '</p></div>' : '') +
+    (comp.workon ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">🎯 What to Work On</h4><p>' + comp.workon + '</p></div>' : '') +
+    (comp.videos && comp.videos.length ? '<div class="divider"></div><div class="modal-section"><h4 class="neutral">📹 Videos</h4>' +
+      comp.videos.map(v =>
+        '<div style="background:var(--parchment);border-radius:8px;padding:10px;margin-bottom:6px;">' +
+        (v.desc ? '<div style="font-size:13px;font-weight:600;margin-bottom:3px;">' + v.desc + '</div>' : '') +
+        (v.url ? '<a href="' + v.url + '" target="_blank" style="font-size:12px;color:var(--zuri);word-break:break-all;">' + v.url + '</a>' : '') +
+        '</div>'
+      ).join('') + '</div>' : '') +
+    '<div class="divider"></div>' +
+    '<div style="display:flex;gap:8px;margin-top:4px;">' +
+      '<button onclick="deleteComp(' + id + ')" style="padding:8px 14px;background:var(--red-light);color:var(--red);border:1.5px solid var(--red);border-radius:8px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Delete</button>' +
+    '</div>';
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function deleteComp(id) {
+  if (!confirm('Delete this competition entry?')) return;
+  const comps = getComps().filter(c => c.id !== id);
+  saveComps(comps);
+  closeModal();
+  renderCompLog();
+  showToast('Competition deleted');
+}
+
+init();
+</script>
+</body>
+</html>
     const dateStr = date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 
     const zuriMorning = getPlanSlot(dk, 'zuri', 'morning');
