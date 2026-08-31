@@ -1195,6 +1195,21 @@ function loadTodayDraft() {
   loadTopics(d.topics || []);
   loadFeedbackItems(d.feedbackItems || []);
   loadVideoItems(d.videoItems || []);
+
+  // If no draft training notes, pull from the plan for this slot
+  if (!d.training && !d.topic1) {
+    const planText = getPlanSlot(dk, currentDog, currentSlot);
+    if (planText) {
+      setVal('l-training', planText);
+      // Show indicator
+      const lbl = document.getElementById('log-date-label');
+      if (lbl) {
+        const isToday = dk === todayKey();
+        lbl.textContent = (isToday ? 'Today' : new Date(dk+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})) + ' — plan loaded from schedule';
+        lbl.style.color = 'var(--zuri)';
+      }
+    }
+  }
 }
 
 function val(id) { const el = document.getElementById(id); return el ? el.value : ''; }
