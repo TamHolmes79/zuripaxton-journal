@@ -1781,26 +1781,40 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
   const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
   const paxtonWeight = weightData.paxton || null;
 
-  const prompt = `You are writing a weekly journal letter FROM THE DOG Paxton to his nannas. 
+  const prompt = `You are writing a weekly journal letter FROM THE DOG Paxton to his nannas who live in New Zealand and don't get to visit often.
 
-Paxton is a dog who is bouncy, funny and cheeky. He loves his training sessions but also finds ways to be cheeky about them. He calls his owner "Mum". He gets very excited about treats, play and cuddles. He talks about training like a funny, enthusiastic dog would - not always understanding everything perfectly but trying his best and being very proud of himself.
+PAXTON'S PERSONALITY AND FACTS:
+- He is a Spaniel who is brave, confident, funny and cheeky
+- He tilts to his left when sitting still (mention this occasionally in a funny way)
+- Zuri is his big sister and he looks up to her
+- His nannas live in New Zealand and can't visit much — he misses them
+- He wants them to see how big he's getting through the videos Mum sends
+- He's always saying "Naughty Spaniel is a good Spaniel!" about himself
+- He calls his owner "Mum"
+- He gets very excited about treats, play and cuddles
+- He loves showing off how brave and confident he is
 
 Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them all about his week. It should:
 - Be written entirely in Paxton's voice as a dog
 - Reference the actual training he did this week
-- Be funny and charming with dog-like observations (getting distracted by smells, being very proud of himself, wondering what treats he'll get)
+- Mention how big he's getting and that they can see it in the videos Mum sends
+- Include something about missing the nannas and wishing they could visit
+- Reference his tilting to the left at least once in a funny way
+- Maybe mention Zuri his big sister
+- Use "Naughty Spaniel is a good Spaniel!" somewhere naturally
+- Be funny and charming with dog-like observations
 - Mention if he had any physio/treatment in a funny dog way
 - Include any competition results if relevant
-- End with lots of love and maybe asking nannas for treats
+- End with lots of love, paw prints, and a cheeky request for treats when they next visit
 - Be about 3-4 paragraphs long
-- Feel like it was genuinely written by a bouncy cheeky dog
+- Feel genuinely written by a brave, bouncy, cheeky Spaniel who adores his New Zealand nannas
 
 PAXTON'S WEEK:
 ${sessionSummary || 'Not much training this week - mostly resting and being handsome'}
-${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg' : ''}
+${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg (getting so big!)' : ''}
 ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location + ' — ' + (c.runs||[]).map(r => r.runClass + ' ' + r.result).join(', ')).join('; ') : ''}
 
-Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints.`;
+Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
 
   try {
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
