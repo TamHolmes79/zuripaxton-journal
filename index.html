@@ -1539,7 +1539,8 @@ async function generateSummary() {
   const output = document.getElementById('summary-output');
 
   if (!weekEntries.length) {
-    output.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions this week</h3><p>Log some sessions first, then generate the summary.</p></div>`;
+    const allKeys = allEntries.map(e => e.date).join(', ');
+    output.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><h3>No sessions this week</h3><p>Looking for dates: ${dateKeys.join(', ')}</p><p style="margin-top:6px;">Found entries for: ${allKeys || 'none'}</p><p style="margin-top:6px;">Try pressing the sync button or re-opening the app.</p></div>`;
     return;
   }
 
@@ -1792,11 +1793,34 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
 
   const sessionSummary = paxtonEntries.map(e => {
     const d = new Date(e.date + 'T12:00:00');
-    return d.toLocaleDateString('en-US',{weekday:'long'}) + ' ' + (e.session||'') + ': ' +
-      (e.sessionTopics && e.sessionTopics.length ? e.sessionTopics.join(', ') : e.training) +
-      (e.wins && e.wins.length ? '. Wins: ' + e.wins.join(', ') : '') +
-      (e.challenges && e.challenges.length ? '. Tricky bits: ' + e.challenges.join(', ') : '');
+    const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+    const slot = e.session || '';
+    const topics = e.sessionTopics && e.sessionTopics.length ? e.sessionTopics.join(', ') : '';
+    const wins = e.wins && e.wins.length ? e.wins.join(', ') : '';
+    const challenges = e.challenges && e.challenges.length ? e.challenges.join(', ') : '';
+    const feedback = e.feedbackItems && e.feedbackItems.length ?
+      e.feedbackItems.map(f => (f.who||'Someone') + ': ' + f.text).join(' | ') :
+      (e.dave ? 'Uncle Dave: ' + e.dave : '');
+    return dayName + ' ' + slot + ':\n' +
+      (topics ? '  Topics: ' + topics + '\n' : '') +
+      (e.training ? '  What happened: ' + e.training + '\n' : '') +
+      (wins ? '  Wins: ' + wins + '\n' : '') +
+      (challenges ? '  Challenges: ' + challenges + '\n' : '') +
+      (feedback ? '  Feedback: ' + feedback + '\n' : '') +
+      (e.workon ? '  Work on next: ' + e.workon + '\n' : '');
   }).join('\n');
+
+  // Get next week's plan for Paxton
+  const nextWeekDays = getWeekDates(sumWeekOffset + 1);
+  const nextWeekPlan = nextWeekDays.map(d => {
+    const dk = dateKey(d);
+    const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
+    const morning = getPlanSlot(dk, 'paxton', 'morning');
+    const midday = getPlanSlot(dk, 'paxton', 'midday');
+    const afternoon = getPlanSlot(dk, 'paxton', 'afternoon');
+    if (!morning && !midday && !afternoon) return '';
+    return dayName + ': ' + [morning, midday, afternoon].filter(Boolean).join(' | ');
+  }).filter(Boolean).join('\n');
 
   const weightData = JSON.parse(localStorage.getItem(weightKey()) || '{}');
   const paxtonWeight = weightData.paxton || null;
@@ -1828,7 +1852,9 @@ STYLE GUIDE — write in exactly this voice and energy:
 
 Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them all about his week. It should:
 - Be written entirely in Paxton's voice as a dog — exactly like the style guide above
-- Reference the actual training he did this week with Uncle Dave, Aunty Megan, and any other Aunties and Uncles
+- Reference what he actually did EACH DAY this week — go through the days and mention the specific training, what was brilliant, what was tricky
+- Mention Uncle Dave's feedback specifically and what Uncle Dave said in a funny appreciative way
+- If there's a plan for next week, hint at what exciting things are coming up next week
 - Mention how big he's getting and that they can see it in the videos Mum sends
 - Include something about missing the nannas and wishing they could visit from New Zealand
 - Reference his tilting to the left at least once in a funny way
@@ -1842,10 +1868,11 @@ Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them
 - Be about 3-4 paragraphs long
 - Feel genuinely written by a brave, bouncy, cheeky Spaniel who adores his New Zealand nannas
 
-PAXTON'S WEEK:
+PAXTON'S WEEK — FULL DAILY DETAILS:
 ${sessionSummary || 'Not much training this week - mostly resting and being handsome'}
 ${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg (getting so big!)' : ''}
 ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location + ' — ' + (c.runs||[]).map(r => r.runClass + ' ' + r.result).join(', ')).join('; ') : ''}
+${nextWeekPlan ? 'NEXT WEEK\'S TRAINING PLAN:\n' + nextWeekPlan : ''}
 
 Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
 
