@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1798,15 +1798,20 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
     const topics = e.sessionTopics && e.sessionTopics.length ? e.sessionTopics.join(', ') : '';
     const wins = e.wins && e.wins.length ? e.wins.join(', ') : '';
     const challenges = e.challenges && e.challenges.length ? e.challenges.join(', ') : '';
-    const feedback = e.feedbackItems && e.feedbackItems.length ?
-      e.feedbackItems.map(f => (f.who||'Someone') + ': ' + f.text).join(' | ') :
-      (e.dave ? 'Uncle Dave: ' + e.dave : '');
+    const feedback = [];
+    if (e.feedbackItems && e.feedbackItems.length) {
+      e.feedbackItems.forEach(f => { if (f.text) feedback.push((f.who||'Someone') + ': ' + f.text); });
+    }
+    if (e.dave && !feedback.some(f => f.includes(e.dave.substring(0,20)))) {
+      feedback.push('Uncle Dave: ' + e.dave);
+    }
+    const feedbackStr2 = feedback.join(' | ');
     return dayName + ' ' + slot + ':\n' +
       (topics ? '  Topics: ' + topics + '\n' : '') +
       (e.training ? '  What happened: ' + e.training + '\n' : '') +
       (wins ? '  Wins: ' + wins + '\n' : '') +
       (challenges ? '  Challenges: ' + challenges + '\n' : '') +
-      (feedback ? '  Feedback: ' + feedback + '\n' : '') +
+      (feedbackStr2 ? '  Feedback: ' + feedbackStr2 + '\n' : '') +
       (e.workon ? '  Work on next: ' + e.workon + '\n' : '');
   }).join('\n');
 
@@ -3024,3 +3029,4 @@ init();
 </script>
 </body>
 </html>
+
