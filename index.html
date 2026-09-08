@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1835,12 +1836,13 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
       feedback.push('Uncle Dave: ' + e.dave);
     }
     const feedbackStr2 = feedback.join(' | ');
+    // Include entry even if no training text - feedback only entries are important
     return dayName + ' ' + slot + ':\n' +
       (topics ? '  Topics: ' + topics + '\n' : '') +
       (e.training ? '  What happened: ' + e.training + '\n' : '') +
       (wins ? '  Wins: ' + wins + '\n' : '') +
       (challenges ? '  Challenges: ' + challenges + '\n' : '') +
-      (feedbackStr2 ? '  Feedback: ' + feedbackStr2 + '\n' : '') +
+      (feedbackStr2 ? '  Feedback received: ' + feedbackStr2 + '\n' : '') +
       (e.workon ? '  Work on next: ' + e.workon + '\n' : '');
   }).join('\n');
 
@@ -1913,9 +1915,12 @@ ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location +
 ${nextWeekPlan ? 'NEXT WEEK\'S TRAINING PLAN:\n' + nextWeekPlan : ''}
 
 IMPORTANT REMINDERS FOR THIS LETTER:
-- ALWAYS mention his lean to the left at some point — he has been sitting a long time and slowly leaning further and further left like a fluffy Tower of Pisa and doesn't notice
-- ALWAYS mention Uncle Dave's feedback specifically — what he said, in Paxton's funny interpretation of it
-- If there was a show or competition, make it a BIG deal
+- The week runs MONDAY through SUNDAY — include ALL days that have any content
+- Some days may have ONLY feedback (like Sunday) — these are VERY IMPORTANT, include Uncle Dave's and Aunty Megan's feedback specifically with their exact words interpreted through Paxton's funny dog brain
+- ALWAYS mention his lean to the left at some point — he sits for too long and slowly leans further and further left like a fluffy Tower of Pisa and doesn't notice at all
+- ALWAYS include what Uncle Dave said as feedback — Paxton finds it very important and slightly confusing but he tries his best
+- If there was a show or competition, make it a HUGE deal
+- Mention how big he is getting and that nannas can see in the videos
 
 Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
 
