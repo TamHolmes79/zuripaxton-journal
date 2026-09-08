@@ -1807,6 +1807,19 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
     weekComps = getComps().filter(c => dateKeys.includes(c.date));
   }
 
+  // Collect ALL feedback from ALL entries this week for Paxton
+  const allPaxFeedback = paxtonEntries.flatMap(e => {
+    const items = [];
+    if (e.feedbackItems && e.feedbackItems.length) {
+      e.feedbackItems.forEach(f => { if (f.text) items.push((f.who||'Someone') + ': ' + f.text); });
+    }
+    if (e.dave && !items.some(f => f.includes(e.dave.substring(0,20)))) {
+      items.push('Uncle Dave: ' + e.dave);
+    }
+    return items;
+  });
+  const allPaxFeedbackStr = allPaxFeedback.length ? allPaxFeedback.join('\n\n') : 'No feedback this week';
+
   const sessionSummary = paxtonEntries.map(e => {
     const d = new Date(e.date + 'T12:00:00');
     const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
@@ -1891,9 +1904,18 @@ Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them
 
 PAXTON'S WEEK — FULL DAILY DETAILS:
 ${sessionSummary || 'Not much training this week - mostly resting and being handsome'}
+
+ALL FEEDBACK FROM UNCLE DAVE AND OTHERS THIS WEEK (include this in the letter!):
+${allPaxFeedbackStr}
+
 ${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg (getting so big!)' : ''}
 ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location + ' — ' + (c.runs||[]).map(r => r.runClass + ' ' + r.result).join(', ')).join('; ') : ''}
 ${nextWeekPlan ? 'NEXT WEEK\'S TRAINING PLAN:\n' + nextWeekPlan : ''}
+
+IMPORTANT REMINDERS FOR THIS LETTER:
+- ALWAYS mention his lean to the left at some point — he has been sitting a long time and slowly leaning further and further left like a fluffy Tower of Pisa and doesn't notice
+- ALWAYS mention Uncle Dave's feedback specifically — what he said, in Paxton's funny interpretation of it
+- If there was a show or competition, make it a BIG deal
 
 Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
 
