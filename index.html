@@ -659,33 +659,46 @@ async function syncAllFromCloud() {
   if (!supa) return;
   try {
     const { data } = await supa.from('journal_data').select('key, value');
-    if (!data || !data.length) return; // cloud is empty — don't overwrite local
-    
-    // For entries key, merge cloud and local — keep whichever has more entries
-    const localEntries = JSON.parse(localStorage.getItem('entries') || '[]');
-    const cloudRow = data.find(r => r.key === 'entries');
-    const cloudEntries = cloudRow ? JSON.parse(cloudRow.value || '[]') : [];
-    
-    // Merge: combine both arrays, deduplicate by id, keep most recent
-    const merged = [...localEntries];
-    cloudEntries.forEach(ce => {
-      if (!merged.find(le => le.id === ce.id)) {
-        merged.push(ce);
-      }
-    });
-    if (merged.length > 0) {
-      localStorage.setItem('entries', JSON.stringify(merged));
-    }
-    
-    // For all other keys, only overwrite local if local is empty
+    if (!data || !data.length) return;
+
     data.forEach(row => {
-      if (row.key === 'entries') return; // already handled above
-      const local = localStorage.getItem(row.key);
-      if (!local || local === '{}' || local === '[]' || local === '') {
-        localStorage.setItem(row.key, row.value);
+      if (row.key === 'entries') {
+        // MERGE entries — never overwrite local with less data
+        const local = JSON.parse(localStorage.getItem('entries') || '[]');
+        const cloud = JSON.parse(row.value || '[]');
+        // Build a map of all entries by id, cloud first then local overwrites
+        const map = {};
+        cloud.forEach(e => { map[e.id] = e; });
+        local.forEach(e => { map[e.id] = e; }); // local wins on conflict
+        const merged = Object.values(map).sort((a,b) => b.id - a.id);
+        if (merged.length >= local.length) {
+          localStorage.setItem('entries', JSON.stringify(merged));
+        }
+        // Push merged back to cloud
+        if (supa && merged.length > cloud.length) {
+          supa.from('journal_data').upsert({ key: 'entries', value: JSON.stringify(merged) }, { onConflict: 'key' }).then(() => {}).catch(() => {});
+        }
+      } else if (row.key === 'comps') {
+        const local = JSON.parse(localStorage.getItem('comps') || '[]');
+        const cloud = JSON.parse(row.value || '[]');
+        const map = {};
+        cloud.forEach(e => { map[e.id] = e; });
+        local.forEach(e => { map[e.id] = e; });
+        const merged = Object.values(map).sort((a,b) => b.id - a.id);
+        if (merged.length >= local.length) {
+          localStorage.setItem('comps', JSON.stringify(merged));
+        }
+      } else {
+        // For all other keys only write if local is empty
+        const local = localStorage.getItem(row.key);
+        if (!local || local === '{}' || local === '[]' || local === '') {
+          localStorage.setItem(row.key, row.value);
+        }
       }
     });
-  } catch(e) {}
+  } catch(e) {
+    console.error('Sync error:', e);
+  }
 }
 
 // ─── LOG DATE ────────────────────────────────────────────────────
@@ -1329,7 +1342,10 @@ function clearForm() {
 }
 
 function getEntries() { return JSON.parse(localStorage.getItem('entries') || '[]'); }
-function saveEntries(e) { cloudSet('entries', JSON.stringify(e)); }
+function saveEntries(e) { 
+  localStorage.setItem('entries', JSON.stringify(e));
+  cloudSet('entries', JSON.stringify(e)); 
+}
 function hasLog(dateStr, dog) { return getEntries().some(e => e.date === dateStr && e.dog === dog); }
 
 // ─── HISTORY ──────────────────────────────────────────────────────
