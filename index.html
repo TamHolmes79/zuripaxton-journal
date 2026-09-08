@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1664,7 +1664,7 @@ Respond ONLY with a JSON object (no markdown, no backticks):
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST',
       headers: ANTHROPIC_HEADERS,
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 3000, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
     });
     const rawText = await res.text();
     console.log('Worker response status:', res.status);
@@ -1672,7 +1672,22 @@ Respond ONLY with a JSON object (no markdown, no backticks):
     const data = JSON.parse(rawText);
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = (data.content && data.content[0] && data.content[0].text) || '';
-    const s = JSON.parse(text.replace(/```json|```/g,'').trim());
+    let s;
+    try {
+      s = JSON.parse(text.replace(/```json|```/g,'').trim());
+    } catch(parseErr) {
+      // Try to fix truncated JSON by closing it
+      let fixedText = text.replace(/```json|```/g,'').trim();
+      // Count open braces and close them
+      const opens = (fixedText.match(/\{/g)||[]).length;
+      const closes = (fixedText.match(/\}/g)||[]).length;
+      for (let i = 0; i < opens - closes; i++) fixedText += '}';
+      try {
+        s = JSON.parse(fixedText);
+      } catch(e2) {
+        throw new Error('Summary response was too long and got cut off. Try again — it sometimes takes 2 attempts for a full week.');
+      }
+    }
 
     output.innerHTML = `
       <div class="summary-card" style="background:linear-gradient(135deg,var(--zuri-light) 0%,var(--paxton-light) 100%);">
