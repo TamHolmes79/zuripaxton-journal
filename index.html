@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -792,13 +792,28 @@ function showSyncStatus(msg, fadeOut) {
   if (!el) {
     el = document.createElement('div');
     el.id = 'sync-status';
-    el.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--forest);color:white;font-size:11px;font-weight:600;padding:4px 14px;border-radius:0 0 10px 10px;z-index:999;transition:opacity 0.5s;font-family:Inter,sans-serif;';
+    el.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--forest);color:white;font-size:11px;font-weight:600;padding:4px 14px;border-radius:0 0 10px 10px;z-index:999;transition:opacity 0.5s;font-family:Inter,sans-serif;cursor:pointer;';
+    el.title = 'Tap to force sync all data to cloud';
+    el.onclick = forceSyncToCloud;
     document.body.appendChild(el);
   }
   el.textContent = msg;
   el.style.opacity = '1';
   if (fadeOut) {
-    setTimeout(() => { el.style.opacity = '0'; }, 2000);
+    setTimeout(() => { el.style.opacity = '0.3'; el.textContent = '☁️ Sync'; }, 2000);
+  }
+}
+
+async function forceSyncToCloud() {
+  showSyncStatus('Pushing all data to cloud...');
+  try {
+    const entries = getEntries();
+    const comps = getComps();
+    if (entries.length) await cloudSet('entries', JSON.stringify(entries));
+    if (comps.length) await cloudSet('comps', JSON.stringify(comps));
+    showSyncStatus('✅ All data pushed to cloud! (' + entries.length + ' entries)', true);
+  } catch(e) {
+    showSyncStatus('Sync failed: ' + e.message, true);
   }
 }
 
@@ -1920,7 +1935,7 @@ Write a warm, funny, cheeky weekly letter from Paxton to his nannas telling them
 - Mention if he had any physio/treatment in a funny dog way
 - Include any competition results if relevant — Uncle Dave and Aunty Megan would be proud!
 - End with lots of love, paw prints, and a cheeky request for treats when they next visit
-- Be about 3-4 paragraphs long
+- Be 8-10 paragraphs long — cover every single day, every training session, every funny moment, Uncle Dave's full feedback, Aunty Megan's suggestions, the show if there was one, what's coming next week, and end with a big heartfelt treat request to the nannas
 - Feel genuinely written by a brave, bouncy, cheeky Spaniel who adores his New Zealand nannas
 
 PAXTON'S WEEK — FULL DAILY DETAILS:
@@ -1947,7 +1962,7 @@ Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nan
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST',
       headers: ANTHROPIC_HEADERS,
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2500, messages: [{ role: 'user', content: prompt }] })
     });
     const rawText = await res.text();
     const data = JSON.parse(rawText);
