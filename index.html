@@ -1838,6 +1838,9 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
   paxtonEntries = allEntries.filter(e => dateKeys.includes(e.date) && e.dog === 'paxton');
   weekComps = getComps().filter(c => dateKeys.includes(c.date));
 
+  // Sort oldest first so the letter goes Monday through Sunday in order
+  paxtonEntries = paxtonEntries.sort((a,b) => a.date.localeCompare(b.date) || (a.session||'').localeCompare(b.session||''));
+
   // Debug — log what we found
   console.log('Paxton letter — week:', dateKeys[0], 'to', dateKeys[6]);
   console.log('Paxton entries found:', paxtonEntries.length, paxtonEntries.map(e => e.date + ' ' + e.session));
@@ -1949,12 +1952,14 @@ ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location +
 ${nextWeekPlan ? 'NEXT WEEK\'S TRAINING PLAN:\n' + nextWeekPlan : ''}
 
 IMPORTANT REMINDERS FOR THIS LETTER:
-- The week runs MONDAY through SUNDAY — include ALL days that have any content
-- Some days may have ONLY feedback (like Sunday) — these are VERY IMPORTANT, include Uncle Dave's and Aunty Megan's feedback specifically with their exact words interpreted through Paxton's funny dog brain
-- ALWAYS mention his lean to the left at some point — he sits for too long and slowly leans further and further left like a fluffy Tower of Pisa and doesn't notice at all
-- ALWAYS include what Uncle Dave said as feedback — Paxton finds it very important and slightly confusing but he tries his best
-- If there was a show or competition, make it a HUGE deal
-- Mention how big he is getting and that nannas can see in the videos
+- Cover ALL days in order Monday through Sunday — do NOT stop at Friday
+- SATURDAY IS THE MOST IMPORTANT DAY if there was a show — dedicate a full paragraph to it, make it huge and exciting
+- SUNDAY must be included — this is when Uncle Dave gave his feedback, which Paxton must talk about
+- Some days may have ONLY feedback (Sunday) — include them, Uncle Dave's and Aunty Megan's feedback is crucial
+- ALWAYS mention the lean to the left — he sits too long and slowly leans like a fluffy Tower of Pisa
+- ALWAYS include Uncle Dave's exact feedback interpreted through Paxton's funny dog brain
+- Include any video links — Paxton mentions them excitedly
+- End with a proper sign off, paw prints, and treat request
 
 Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
 
@@ -3106,3 +3111,4 @@ init();
 </script>
 </body>
 </html>
+
