@@ -1978,7 +1978,7 @@ IMPORTANT REMINDERS FOR THIS LETTER:
 - Include any video links — Paxton mentions them excitedly
 - End with a proper sign off, paw prints, and treat request
 
-Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with exactly this sign off: "Love Paxton xxx 🐾🐾🐾"
+Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with exactly this sign off: "Love Paxton xxx 🐾🐾🐾"`;
 
   try {
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
@@ -2017,40 +2017,27 @@ Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nan
 }
 
 function printPaxtonLetter() {
-  const letterEl = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
+  var letterEl = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
   if (!letterEl) return;
-  const weekLabel = document.getElementById('sum-week-label').textContent;
-  const weekDates = document.getElementById('sum-week-dates').textContent;
-  const win = window.open('', '_blank');
-  const html = [
-    '<!DOCTYPE html><html><head>',
-    '<title>Paxton Letter to Nannas</title>',
-    '<style>',
-    'body{font-family:Georgia,serif;max-width:680px;margin:0 auto;padding:40px 30px;color:#1A1A2E;background:white;}',
-    '.header{text-align:center;margin-bottom:40px;padding-bottom:24px;border-bottom:3px solid #2A9D8F;}',
-    '.badge{display:inline-block;background:#2A9D8F;color:white;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:16px;font-family:sans-serif;}',
-    'h1{font-family:Georgia,serif;font-size:28px;color:#2A9D8F;margin-bottom:6px;}',
-    '.week-label{font-size:14px;color:#7B72A8;font-weight:600;}',
-    '.letter-body{font-size:16px;line-height:1.9;color:#2C2C3E;white-space:pre-wrap;margin-bottom:40px;}',
-    '.footer{text-align:center;padding-top:24px;border-top:2px solid #E0F4F2;font-size:12px;color:#9B8FCC;font-style:italic;}',
-    '@media print{body{padding:20px;}@page{margin:1.5cm;}}',
-    '</style></head><body>',
-    '<div class="header">',
-    '<div style="font-size:40px;margin-bottom:12px;">🐾</div>',
-    '<div class="badge">PAXTON'S WEEKLY LETTER</div>',
-    '<h1>Dear Nannas,</h1>',
-    '<div class="week-label">' + weekLabel + ' &nbsp;&middot;&nbsp; ' + weekDates + '</div>',
-    '</div>',
-    '<div class="letter-body">' + letterEl.textContent + '</div>',
-    '<div class="footer">🐾🐾🐾<br>Zuri & Paxton Training Journal &nbsp;&middot;&nbsp; ' + weekLabel + '</div>',
-    '</body></html>'
-  ].join('');
-  win.document.write(html);
+  var weekLabel = document.getElementById('sum-week-label').textContent;
+  var weekDates = document.getElementById('sum-week-dates').textContent;
+  var win = window.open('', '_blank');
+  win.document.open();
+  win.document.write('<!DOCTYPE html><html><head><title>Paxton Letter to Nannas</title>');
+  win.document.write('<style>body{font-family:Georgia,serif;max-width:660px;margin:60px auto;padding:20px;color:#1A1A2E;line-height:1.9;font-size:16px;}');
+  win.document.write('h1{color:#2A9D8F;margin-bottom:4px;}.week{color:#7B72A8;font-size:13px;margin-bottom:30px;border-bottom:2px solid #E0F4F2;padding-bottom:16px;}');
+  win.document.write('.letter{white-space:pre-wrap;}.footer{margin-top:40px;padding-top:16px;border-top:2px solid #E0F4F2;font-size:13px;color:#9B8FCC;text-align:center;}');
+  win.document.write('</style></head><body>');
+  win.document.write('<div style="text-align:center;font-size:40px;margin-bottom:16px;">🐾</div>');
+  win.document.write('<h1 style="text-align:center;">Paxton\'s Letter to Nannas</h1>');
+  win.document.write('<div class="week" style="text-align:center;">' + weekLabel + ' &middot; ' + weekDates + '</div>');
+  win.document.write('<div class="letter">' + letterEl.textContent + '</div>');
+  win.document.write('<div class="footer">🐾🐾🐾<br>Zuri & Paxton Training Journal</div>');
+  win.document.write('</body></html>');
   win.document.close();
   win.focus();
   setTimeout(function() { win.print(); }, 500);
 }
-
 function copyPaxtonLetter() {
   const el = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
   if (!el) return;
@@ -2085,39 +2072,25 @@ function printSummary() {
   const weekDates = document.getElementById('sum-week-dates').textContent;
   const summaryContent = document.getElementById('summary-output').innerHTML;
   const win = window.open('', '_blank');
-  const html = [
-    '<!DOCTYPE html><html><head>',
-    '<title>Zuri & Paxton Training Summary</title>',
-    '<style>',
-    'body{font-family:Inter,sans-serif;max-width:740px;margin:0 auto;padding:40px 30px;color:#1A1A2E;}',
-    '.header{text-align:center;margin-bottom:36px;padding-bottom:20px;border-bottom:3px solid #6C5BAE;}',
-    'h1{font-family:Georgia,serif;font-size:26px;color:#2C2A4A;margin-bottom:4px;}',
-    '.week-label{font-size:14px;color:#9B8FCC;font-weight:600;}',
-    '.summary-card{background:#f8f6ff;border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid #D8D3EC;break-inside:avoid;}',
-    'h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9B8FCC;margin-bottom:8px;margin-top:16px;font-weight:700;}',
-    'p,.summary-text{font-size:14px;line-height:1.7;margin:0 0 10px;color:#2C2C3E;}',
-    '.divider{height:1px;background:#D8D3EC;margin:14px 0;}',
-    'a{color:#6C5BAE;word-break:break-all;}',
-    '.dog-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:14px;}',
-    '.zuri{background:#EDE9F7;color:#6C5BAE;}.paxton{background:#E0F4F2;color:#2A9D8F;}',
-    '.footer{text-align:center;margin-top:30px;padding-top:16px;border-top:1px solid #D8D3EC;font-size:12px;color:#9B8FCC;font-style:italic;}',
-    '@media print{body{padding:15px;}@page{margin:1.5cm;}}',
-    '</style></head><body>',
-    '<div class="header">',
-    '<div style="font-size:36px;margin-bottom:10px;">🐾</div>',
-    '<h1>Zuri & Paxton Weekly Training Summary</h1>',
-    '<div class="week-label">' + weekLabel + ' &nbsp;&middot;&nbsp; ' + weekDates + '</div>',
-    '</div>',
-    summaryContent,
-    '<div class="footer">Zuri & Paxton Training Journal &nbsp;&middot;&nbsp; ' + weekLabel + '</div>',
-    '</body></html>'
-  ].join('');
-  win.document.write(html);
+  win.document.open();
+  win.document.write('<!DOCTYPE html><html><head><title>Training Summary</title>');
+  win.document.write('<style>body{font-family:sans-serif;max-width:700px;margin:40px auto;padding:20px;color:#1A1A2E;}');
+  win.document.write('.summary-card{background:#f8f6ff;border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid #D8D3EC;}');
+  win.document.write('h4{font-size:11px;text-transform:uppercase;color:#9B8FCC;margin-bottom:8px;font-weight:700;}');
+  win.document.write('p,.summary-text{font-size:14px;line-height:1.7;margin:0 0 10px;}');
+  win.document.write('.divider{height:1px;background:#D8D3EC;margin:14px 0;}');
+  win.document.write('.dog-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:14px;}');
+  win.document.write('.zuri{background:#EDE9F7;color:#6C5BAE;}.paxton{background:#E0F4F2;color:#2A9D8F;}');
+  win.document.write('a{color:#6C5BAE;word-break:break-all;}');
+  win.document.write('</style></head><body>');
+  win.document.write('<h1 style="font-family:Georgia,serif;color:#2C2A4A;">🐾 Zuri & Paxton Training Summary</h1>');
+  win.document.write('<p style="color:#9B8FCC;margin-bottom:30px;">' + weekLabel + ' · ' + weekDates + '</p>');
+  win.document.write(summaryContent);
+  win.document.write('</body></html>');
   win.document.close();
   win.focus();
   setTimeout(function() { win.print(); }, 500);
 }
-
 function copySummary() {
   const weekLabel = document.getElementById('sum-week-label').textContent;
   const weekDates = document.getElementById('sum-week-dates').textContent;
@@ -3161,4 +3134,3 @@ init();
 </script>
 </body>
 </html>
-
