@@ -2020,10 +2020,41 @@ function printPaxtonLetter() {
   const content = document.getElementById('paxton-letter-output').querySelector('div[style*="font-style:italic"]');
   if (!content) return;
   const weekLabel = document.getElementById('sum-week-label').textContent;
+  const weekDates = document.getElementById('sum-week-dates').textContent;
   const win = window.open('', '_blank');
-  win.document.write('<!DOCTYPE html><html><head><title>Paxton\'s Letter to Nannas</title><style>body{font-family:Georgia,serif;max-width:600px;margin:60px auto;padding:20px;color:#1A1A2E;line-height:1.8;font-size:16px;}h1{color:#2A9D8F;margin-bottom:4px;}p{margin:0 0 8px;}</style></head><body><h1>🐾 Paxton\'s Letter to Nannas</h1><p style="color:#7B72A8;font-size:13px;margin-bottom:30px;">' + weekLabel + '</p><div style="white-space:pre-wrap;">' + content.textContent + '</div></body></html>');
+  win.document.write('<!DOCTYPE html><html><head><title>Paxton\'s Letter to Nannas \u2014 ' + weekLabel + '</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', Georgia, serif; max-width: 680px; margin: 0 auto; padding: 40px 30px; color: #1A1A2E; background: white; }
+    .header { text-align: center; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #2A9D8F; }
+    .paw-top { font-size: 40px; margin-bottom: 12px; display: block; }
+    h1 { font-family: 'Fraunces', Georgia, serif; font-size: 28px; color: #2A9D8F; margin-bottom: 6px; font-weight: 700; }
+    .week-label { font-size: 14px; color: #7B72A8; font-weight: 600; letter-spacing: 0.5px; }
+    .letter-body { font-family: Georgia, serif; font-size: 16px; line-height: 1.9; color: #2C2C3E; white-space: pre-wrap; margin-bottom: 40px; }
+    .footer { text-align: center; padding-top: 24px; border-top: 2px solid #E0F4F2; }
+    .footer-paws { font-size: 28px; margin-bottom: 8px; display: block; }
+    .footer-text { font-size: 12px; color: #9B8FCC; font-style: italic; }
+    .badge { display: inline-block; background: #2A9D8F; color: white; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; font-family: 'Inter', sans-serif; }
+    @media print {
+      body { padding: 20px; }
+      @page { margin: 1.5cm; }
+    }
+  </style></head><body>
+  <div class="header">
+    <span class="paw-top">🐾</span>
+    <div class="badge">PAXTON'S WEEKLY LETTER</div>
+    <h1>Dear Nannas,</h1>
+    <div class="week-label">${weekLabel} &nbsp;·&nbsp; ${weekDates}</div>
+  </div>
+  <div class="letter-body">${content.textContent}</div>
+  <div class="footer">
+    <span class="footer-paws">🐾🐾🐾</span>
+    <div class="footer-text">Zuri & Paxton Training Journal &nbsp;·&nbsp; ${weekLabel}</div>
+  </div>
+  <script>window.onload = function() { window.print(); }<\/script>
+  </body></html>');
   win.document.close();
-  setTimeout(() => win.print(), 500);
 }
 
 function copyPaxtonLetter() {
@@ -2060,29 +2091,37 @@ function printSummary() {
   const weekDates = document.getElementById('sum-week-dates').textContent;
   const content = document.getElementById('summary-output').innerHTML;
   const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>Zuri & Paxton Training Summary — ${weekLabel}</title>
+  win.document.write('<!DOCTYPE html><html><head><title>Zuri & Paxton Training Summary \u2014 ' + weekLabel + '</title>
   <style>
-    body { font-family: Inter, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; color: #1A1A2E; }
-    h1 { font-family: Georgia, serif; color: #2C2A4A; margin-bottom: 4px; }
-    .week { color: #7B72A8; font-size: 14px; margin-bottom: 30px; }
-    .card { background: #f7f5fc; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #D8D3EC; }
-    h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #7B72A8; margin-bottom: 6px; margin-top: 0; }
-    p { font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
-    .divider { height: 1px; background: #D8D3EC; margin: 12px 0; }
-    a { color: #6C5BAE; }
-    .dog-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
-    .zuri-badge { background: #EDE9F7; color: #6C5BAE; }
-    .paxton-badge { background: #E0F4F2; color: #2A9D8F; }
-    @media print { body { margin: 20px; } }
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; max-width: 740px; margin: 0 auto; padding: 40px 30px; color: #1A1A2E; background: white; }
+    .header { text-align: center; margin-bottom: 36px; padding-bottom: 20px; border-bottom: 3px solid #6C5BAE; }
+    .header-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+    h1 { font-family: 'Fraunces', serif; font-size: 26px; color: #2C2A4A; margin-bottom: 4px; }
+    .week-label { font-size: 14px; color: #9B8FCC; font-weight: 600; }
+    .summary-card { background: #f8f6ff; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #D8D3EC; break-inside: avoid; }
+    h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #9B8FCC; margin-bottom: 8px; margin-top: 16px; font-weight: 700; }
+    h4:first-child { margin-top: 0; }
+    p, .summary-text { font-size: 14px; line-height: 1.7; margin: 0 0 10px; color: #2C2C3E; }
+    .divider { height: 1px; background: #D8D3EC; margin: 14px 0; }
+    a { color: #6C5BAE; word-break: break-all; }
+    .dog-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
+    .zuri { background: #EDE9F7; color: #6C5BAE; }
+    .paxton { background: #E0F4F2; color: #2A9D8F; }
+    .footer { text-align: center; margin-top: 30px; padding-top: 16px; border-top: 1px solid #D8D3EC; font-size: 12px; color: #9B8FCC; font-style: italic; }
+    @media print { body { padding: 15px; } @page { margin: 1.5cm; } }
   </style></head><body>
-  <h1>🐾 Zuri & Paxton Training Summary</h1>
-  <div class="week">${weekLabel} &nbsp;·&nbsp; ${weekDates}</div>
-  ${content}
-  <div style="margin-top:30px;font-size:12px;color:#7B72A8;border-top:1px solid #D8D3EC;padding-top:12px;">Generated by Zuri & Paxton Training Journal</div>
-  </body></html>`);
+  <div class="header">
+    <span class="header-icon">🐾</span>
+    <h1>Zuri & Paxton Weekly Training Summary</h1>
+    <div class="week-label">${weekLabel} &nbsp;·&nbsp; ${weekDates}</div>
+  </div>
+  ' + content + '
+  <div class="footer">Zuri & Paxton Training Journal &nbsp;·&nbsp; ' + weekLabel + '</div>
+  <script>window.onload = function() { window.print(); }<\/script>
+  </body></html>');
   win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 500);
 }
 
 function copySummary() {
