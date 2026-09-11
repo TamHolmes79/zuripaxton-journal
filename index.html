@@ -1858,6 +1858,20 @@ async function generatePaxtonLetter(days, paxtonEntries, weekComps) {
   });
   const allPaxFeedbackStr = allPaxFeedback.length ? allPaxFeedback.join('\n\n') : 'No feedback this week';
 
+  // Collect all videos from Paxton's entries this week
+  const allPaxVideos = paxtonEntries.flatMap(e => {
+    const vids = e.videoItems || (e.videos ? [{url:'', desc:e.videos}] : []);
+    return vids.filter(v => v.url || v.desc).map(v => ({
+      url: v.url || '',
+      desc: v.desc || '',
+      date: e.date,
+      session: e.session || ''
+    }));
+  });
+  const videosForLetter = allPaxVideos.length ?
+    allPaxVideos.map(v => (v.desc ? v.desc : 'Video') + (v.url ? ': ' + v.url : '')).join('\n') :
+    'No videos this week';
+
   const sessionSummary = paxtonEntries.map(e => {
     const d = new Date(e.date + 'T12:00:00');
     const dayName = d.toLocaleDateString('en-US',{weekday:'long'});
@@ -1947,6 +1961,9 @@ ${sessionSummary || 'Not much training this week - mostly resting and being hand
 ALL FEEDBACK FROM UNCLE DAVE AND OTHERS THIS WEEK (include this in the letter!):
 ${allPaxFeedbackStr}
 
+VIDEOS SENT THIS WEEK (include these links in the letter — Paxton is very excited about them!):
+${videosForLetter}
+
 ${paxtonWeight ? 'Current weight: ' + paxtonWeight + 'kg (getting so big!)' : ''}
 ${weekComps.length ? 'Competition this week: ' + weekComps.map(c => c.location + ' — ' + (c.runs||[]).map(r => r.runClass + ' ' + r.result).join(', ')).join('; ') : ''}
 ${nextWeekPlan ? 'NEXT WEEK\'S TRAINING PLAN:\n' + nextWeekPlan : ''}
@@ -1961,13 +1978,13 @@ IMPORTANT REMINDERS FOR THIS LETTER:
 - Include any video links — Paxton mentions them excitedly
 - End with a proper sign off, paw prints, and treat request
 
-Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with love from Paxton with some paw prints 🐾`;
+Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nannas," and end with exactly this sign off: "Love Paxton xxx 🐾🐾🐾"
 
   try {
     const res = await fetch('https://holy-heart-4051.johnandtam76.workers.dev', {
       method: 'POST',
       headers: ANTHROPIC_HEADERS,
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2500, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4096, messages: [{ role: 'user', content: prompt }] })
     });
     const rawText = await res.text();
     const data = JSON.parse(rawText);
