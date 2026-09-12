@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1995,6 +1994,17 @@ Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nan
     const weekLabel = document.getElementById('sum-week-label').textContent;
     const weekDates = document.getElementById('sum-week-dates').textContent;
 
+    const videosHtml = allPaxVideos.length ?
+      '<div style="margin-top:16px;padding:14px;background:rgba(42,157,143,0.1);border-radius:10px;border:1.5px solid var(--paxton);">' +
+      '<div style="font-family:Fraunces,serif;font-size:15px;font-weight:700;color:var(--paxton);margin-bottom:10px;">📹 Watch Paxton This Week!</div>' +
+      allPaxVideos.map(v =>
+        '<div style="margin-bottom:10px;">' +
+        (v.desc ? '<div style="font-size:13px;font-weight:700;color:var(--text-dark);margin-bottom:2px;">▶ ' + v.desc + '</div>' : '') +
+        (v.url ? '<a href="' + v.url + '" target="_blank" style="font-size:13px;color:var(--paxton);word-break:break-all;display:block;">' + v.url + '</a>' : '') +
+        '</div>'
+      ).join('') +
+      '</div>' : '';
+
     output.innerHTML =
       '<div class="summary-card" style="background:linear-gradient(135deg,var(--paxton-light) 0%,var(--teal-light,#e0f4f2) 100%);border:2px solid var(--paxton);">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">' +
@@ -2005,6 +2015,7 @@ Write only the letter text, no JSON, no formatting symbols. Start with "Dear Nan
           '</div>' +
         '</div>' +
         '<div style="font-size:15px;line-height:1.8;color:var(--text-dark);white-space:pre-wrap;font-style:italic;">' + letter + '</div>' +
+        videosHtml +
         '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">' +
           '<button onclick="printPaxtonLetter()" style="flex:1;min-width:120px;padding:10px;border:none;border-radius:10px;background:var(--paxton);color:white;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">🖨️ Print</button>' +
           '<button onclick="copyPaxtonLetter()" id="copy-paxton-btn" style="flex:1;min-width:120px;padding:10px;border:1.5px solid var(--paxton);border-radius:10px;background:white;color:var(--paxton);font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📋 Copy</button>' +
